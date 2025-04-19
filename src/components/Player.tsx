@@ -1,4 +1,5 @@
 import MuxPlayer from "@mux/mux-player-react"
+import withAuth from "../hoc/PrivateRoute";
 
 type Props = {}
 
@@ -14,4 +15,4 @@ function Player({ }: Props) {
     )
 }
 
-export default Player
+export default withAuth(Player);

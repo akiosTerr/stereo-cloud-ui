@@ -1,8 +1,9 @@
 import MuxUploader from "@mux/mux-uploader-react";
 import { useEffect, useState } from "react";
 import { createMuxUpload } from "../api/createEndpoint";
+import withAuth from "../hoc/PrivateRoute";
 
-export default function Uploader() {
+function Uploader() {
     const [endpointUrl, setEndpointUrl] = useState('')
     
     useEffect(() => {
@@ -20,3 +21,5 @@ export default function Uploader() {
         <MuxUploader endpoint={endpointUrl} />
     );
 }
+
+export default withAuth(Uploader);

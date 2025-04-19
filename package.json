@@ -12,11 +12,15 @@
   "dependencies": {
     "@mux/mux-player-react": "^3.3.4",
     "@mux/mux-uploader-react": "^1.2.0",
+    "js-cookie": "^3.0.5",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "react-router-dom": "^7.5.1",
+    "styled-components": "^6.1.17"
   },
   "devDependencies": {
     "@eslint/js": "^9.22.0",
+    "@types/js-cookie": "^3.0.6",
     "@types/react": "^19.0.10",
     "@types/react-dom": "^19.0.4",
     "@vitejs/plugin-react-swc": "^3.8.0",

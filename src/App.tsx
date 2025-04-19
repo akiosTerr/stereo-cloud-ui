@@ -1,15 +1,24 @@
+import { Link, Route, Routes, HashRouter as Router } from 'react-router-dom'
 import './App.css'
-import Player from './components/Player'
-import Uploader from './components/uploader'
+import Uploader from './components/Uploader'
+import { useAuth } from './hooks/auth_hook'
+import { SetAuthCtx } from './Contexts'
+import VideoTable from './components/VideoTable'
 
 function App() {
+  const { loggedIn, login, logout } = useAuth();
 
   return (
     <>
-      <div>
-        <Uploader />
-        <Player></Player>
-      </div>
+        <SetAuthCtx.Provider value={{ isLoggedIn: loggedIn, login, logout }}>
+          <nav>
+            <Link to="/">Home</Link> | <Link to="/upload">Upload</Link>
+          </nav>
+          <Routes>
+            <Route path="/" element={<VideoTable/>} />
+            <Route path="/upload" element={<Uploader />} />
+          </Routes>
+        </SetAuthCtx.Provider>
     </>
   )
 }
