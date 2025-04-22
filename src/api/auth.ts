@@ -3,6 +3,10 @@ export interface LoginData {
     password: string
 }
 
+export interface AuthResponse {
+    access_token: string
+}
+
 const GetLoginToken = async ({ email, password }: LoginData, login: Function, setError: Function, setIsLoading: Function) => {
     if (!email || !password) {
         setError('Email and password are required.');
@@ -26,8 +30,8 @@ const GetLoginToken = async ({ email, password }: LoginData, login: Function, se
         if (!response.ok) {
             throw new Error(data.message || 'Login failed');
         }
-
-        login(data.token)
+        
+        login(data.access_token)
     } catch (err: any) {
         setError(err.message || 'Something went wrong');
     } finally {

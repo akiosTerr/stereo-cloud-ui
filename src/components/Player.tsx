@@ -1,12 +1,15 @@
 import MuxPlayer from "@mux/mux-player-react"
 import withAuth from "../hoc/PrivateRoute";
+import { useParams } from "react-router-dom";
 
 type Props = {}
 
 function Player({ }: Props) {
+    const {id} = useParams()
+    
     return (
         <MuxPlayer
-            playbackId="Zex1H9dyvncHoDZMaR3LVjmN4Oby9pw6D2cmPcheiL4"
+            playbackId={id}
             metadata={{
                 video_title: 'Placeholder (optional)',
                 viewer_user_id: 'Placeholder (optional)',

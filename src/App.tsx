@@ -4,6 +4,7 @@ import Uploader from './components/Uploader'
 import { useAuth } from './hooks/auth_hook'
 import { SetAuthCtx } from './Contexts'
 import VideoTable from './components/VideoTable'
+import Player from './components/Player'
 
 function App() {
   const { loggedIn, login, logout } = useAuth();
@@ -17,6 +18,7 @@ function App() {
           <Routes>
             <Route path="/" element={<VideoTable/>} />
             <Route path="/upload" element={<Uploader />} />
+            <Route path="/player/:id" element={<Player />} />
           </Routes>
         </SetAuthCtx.Provider>
     </>

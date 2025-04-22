@@ -15,7 +15,7 @@ export type MuxUploadResponse = {
 };
 
 
-export const createMuxUpload = async (): Promise<MuxUploadResponse> => {
+export const createMuxUpload = async (videoTitle: string): Promise<MuxUploadResponse> => {
   let token = Cookies.get('jwtToken');
   if (!token) {
     token = ""
@@ -26,7 +26,10 @@ export const createMuxUpload = async (): Promise<MuxUploadResponse> => {
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${token}`
-      }
+      },
+      body: JSON.stringify({
+        title: videoTitle
+      })
     });
 
   if (!response.ok) {

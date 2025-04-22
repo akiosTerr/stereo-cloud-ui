@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import GetLoginToken from '../api/auth';
+import { TextInput } from '../style';
 
 const Container = styled.div`
   height: 50vh;
@@ -30,20 +31,6 @@ const Title = styled.h2`
   margin-bottom: 1.5rem;
   margin-top: 0;
   color: #ddd5e4;
-`;
-
-const Input = styled.input`
-  width: auto;
-  padding: 0.75rem;
-  margin-bottom: 1rem;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  font-size: 1rem;
-
-  &:focus {
-    border-color: #0077ff;
-    outline: none;
-  }
 `;
 
 const Button = styled.button`
@@ -95,13 +82,13 @@ function LoginPage({login}:LoginFormType) {
     <FormWrapper>
       <Title>Login</Title>
       <Form onSubmit={handleSubmit}>
-        <Input
+        <TextInput
           type="email"
           placeholder="Email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
         />
-        <Input
+        <TextInput
           type="password"
           placeholder="Password"
           value={password}
