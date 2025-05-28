@@ -1,15 +1,19 @@
 import MuxUploader from "@mux/mux-uploader-react";
 import { useState } from "react";
 import { createMuxUpload } from "../api/createEndpoint";
-import withAuth from "../hoc/PrivateRoute";
 import styled from "styled-components";
 import { TextInput } from "../style";
 
 const WrapUploader = styled.div`
     width: 367px;
+    margin: auto;
 `
 
-function Uploader() {
+interface UploaderProps {
+    onSuccess: Function
+}
+
+function Uploader({onSuccess}: UploaderProps) {
     const [endpointUrl, setEndpointUrl] = useState('')
     const [videoTitle, setVideoTitle] = useState('')
     const [validated, setValidated] = useState(false)
@@ -31,6 +35,7 @@ function Uploader() {
     const onSuccessUplodHandler = (e: any) => {
         console.log('success');
         console.log(e.target.type);
+        onSuccess()
     }
 
     return (
@@ -48,4 +53,4 @@ function Uploader() {
     );
 }
 
-export default withAuth(Uploader);
+export default Uploader;

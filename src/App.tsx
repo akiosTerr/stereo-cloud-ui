@@ -1,6 +1,5 @@
-import { Link, Route, Routes, HashRouter as Router } from 'react-router-dom'
+import { Link, Route, Routes} from 'react-router-dom'
 import './App.css'
-import Uploader from './components/Uploader'
 import { useAuth } from './hooks/auth_hook'
 import { SetAuthCtx } from './Contexts'
 import VideoTable from './components/VideoTable'
@@ -17,8 +16,7 @@ function App() {
           </nav>
           <Routes>
             <Route path="/" element={<VideoTable/>} />
-            <Route path="/upload" element={<Uploader />} />
-            <Route path="/player/:id" element={<Player />} />
+            <Route path="/player/:playback_id" element={<Player />} />
           </Routes>
         </SetAuthCtx.Provider>
     </>
