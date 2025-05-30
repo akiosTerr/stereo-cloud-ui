@@ -5,6 +5,7 @@ export type VideoAsset = {
     user_id: string,
     upload_id: string,
     asset_id: string,
+    isPrivate: boolean,
     playback_id: string,
     title: string,
     status: string,

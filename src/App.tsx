@@ -16,7 +16,7 @@ function App() {
           </nav>
           <Routes>
             <Route path="/" element={<VideoTable/>} />
-            <Route path="/player/:playback_id" element={<Player />} />
+            <Route path="/player/" element={<Player />} />
           </Routes>
         </SetAuthCtx.Provider>
     </>

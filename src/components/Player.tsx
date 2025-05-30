@@ -1,9 +1,7 @@
 import MuxPlayer from "@mux/mux-player-react"
 import withAuth from "../hoc/PrivateRoute";
-import { useParams } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import styled from "styled-components";
-import { useEffect, useState } from "react";
-import { fetchVideoInfo, fetchVideoToken } from "../api/fetchVideos";
 
 type Props = {}
 
@@ -13,29 +11,19 @@ const Wrapper = styled.div`
 `
 
 function Player({ }: Props) {
-    const { playback_id } = useParams()
-    const [token, setToken] = useState('')
-    const [isPrivate, setIsPrivate] = useState(false)
+    const location = useLocation();
+    const playback_id = location.state?.playbackId;
+    const videoToken = location.state?.token;
 
     const getToken = () => {
         return {
-            playback: token
+            playback: videoToken
         }
     }
 
-    useEffect(() => {
-        fetchVideoInfo(playback_id)
-            .then((dt) => {
-                setIsPrivate(dt.isPrivate)
-            })
-    }, [])
-
-    useEffect(() => {
-        if (isPrivate) {
-            fetchVideoToken(playback_id)
-                .then(res => setToken(res.token))
-        }
-    }, [isPrivate])
+    if (!playback_id) {
+        return <div>No video ID provided</div>;
+    }
 
     return (
         <Wrapper>

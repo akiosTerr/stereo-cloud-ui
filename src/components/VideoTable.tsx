@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import withAuth from "../hoc/PrivateRoute";
-import { getMuxAssets, VideoAsset } from "../api/fetchVideos";
+import { fetchVideoToken, getMuxAssets, VideoAsset } from "../api/fetchVideos";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import Uploader from "./Uploader";
@@ -44,23 +44,53 @@ const VideoBlock = styled.div`
   border-radius: 0.6rem;
 `
 
+type VideoAssetWithTokens = VideoAsset & {
+    tokenVideo?: string;
+    tokenThumbnail?: string;
+}
+
+
 const VideoTable = () => {
   const navigate = useNavigate();
-  const [videos, setVideos] = useState<VideoAsset[]>([])
+  const [videos, setVideos] = useState<VideoAssetWithTokens[]>([])
 
-  const getThumbUrl = (id: string) => {
-    return `https://image.mux.com/${id}/thumbnail.png?width=214&height=121&time=2`
+  const getThumbUrl = (id: string, isPrivate: boolean = false) => {
+    if (!isPrivate) {
+      return `https://image.mux.com/${id}/thumbnail.png?width=214&height=121&time=2`
+    } else {
+      const token = isPrivate ? videos.find(v => v.playback_id === id)?.tokenThumbnail : null
+      return `https://image.mux.com/${id}/thumbnail.png?width=214&height=121&time=2&token=${token}`
+    }
   }
 
-  const handleRedirectVideo = (playbackId: string) => {
-    navigate(`/player/${playbackId}`);
+  const handleRedirectVideo = (playbackId: string, isPrivate: boolean = false) => {
+   if(isPrivate) {  
+    const token = videos.find(v => v.playback_id === playbackId)?.tokenVideo
+    navigate('/player', { state: { playbackId, token } });
+   } else {
+    navigate('/player', { state: { playbackId } });
+   }
   };
 
-  const updateVideos = () => {
-    getMuxAssets()
-      .then((res) => {
-        setVideos(res)
-      })
+  const signTokens = async (data: VideoAsset[]) => {
+    const promises = data.map(async(item) => {
+      if (item.isPrivate) {
+        const {tokenVideo, tokenThumbnail} = await fetchVideoToken(item.playback_id)
+        return {
+          ...item,
+          tokenVideo,
+          tokenThumbnail
+        }
+      }
+      return item
+    })
+    return Promise.all(promises)
+  }
+ 
+  const updateVideos = async () => {
+    const data = await getMuxAssets();
+    const signedVideos = await signTokens(data);
+    setVideos(signedVideos);
   }
 
   useEffect(() => {
@@ -76,10 +106,6 @@ const VideoTable = () => {
     }
   }
 
-  const errorHandler = (error: string) => {
-    console.log(error);
-  }
-
   return (
     <>
       <Title>Upload Video</Title>
@@ -90,8 +116,8 @@ const VideoTable = () => {
           <VideoBlock key={item.id}>
             <div>
               <VideoThumbnail onClick={() => {
-                handleRedirectVideo(item.playback_id);
-              }} src={getThumbUrl(item.playback_id)} alt="" />
+                handleRedirectVideo(item.playback_id, item.isPrivate);
+              }} src={getThumbUrl(item.playback_id, item.isPrivate)} alt="" />
               <h2>{item.title}</h2>
             </div>
             <ButtonRow>
