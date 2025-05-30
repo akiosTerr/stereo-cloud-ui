@@ -78,3 +78,28 @@ export const fetchVideoToken = async (playback_id?: string) => {
     const data = await response.json();
     return data;
 }
+
+export const fetchVideoInfo = async (id?: string) => {
+     
+    if(!id) {
+        return new Error("no playback id found!")
+    }
+
+     let token = Cookies.get('jwtToken');     
+    
+    if (!token) {
+        token = "";
+    }
+
+    const response = await fetch(`http://localhost:3000/mux/${id}`,
+        {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            }
+        });
+
+    const data = await response.json();
+    return data;
+}
