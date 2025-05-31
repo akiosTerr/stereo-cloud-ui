@@ -1,12 +1,12 @@
 
 import Cookies from "js-cookie";
 
-export const deleteMuxVideo = async (id: string) => {
+export const deleteMuxVideo = async (id: string, asset_id: string) => {
   let token = Cookies.get('jwtToken');
   if (!token) {
     token = ""
   }
-  const response = await fetch(`http://localhost:3000/mux/${id}`,
+  const response = await fetch(`http://localhost:3000/mux/${id}/${asset_id}`,
     {
       method: 'DELETE',
       headers: {

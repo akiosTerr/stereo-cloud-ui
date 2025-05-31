@@ -97,9 +97,9 @@ const VideoTable = () => {
     updateVideos()
   }, [])
 
-  const handleDelete = async (id: string) => {
+  const handleDelete = async (id: string, asset_id: string) => {
     if (confirm("delete this?")) {
-      await deleteMuxVideo(id)
+      await deleteMuxVideo(id, asset_id)
       updateVideos()
     } else {
       console.log("canceled");
@@ -119,9 +119,10 @@ const VideoTable = () => {
                 handleRedirectVideo(item.playback_id, item.isPrivate);
               }} src={getThumbUrl(item.playback_id, item.isPrivate)} alt="" />
               <h2>{item.title}</h2>
+              <p>{item.status}</p>
             </div>
             <ButtonRow>
-              <DeleteButton onClick={() => handleDelete(item.id)}>Delete</DeleteButton>
+              <DeleteButton onClick={() => handleDelete(item.id, item.asset_id)}>Delete</DeleteButton>
               <ShareButton>Share</ShareButton>
             </ButtonRow>
           </VideoBlock>
