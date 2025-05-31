@@ -90,9 +90,7 @@ function Uploader({onSuccess}: UploaderProps) {
     const [validated, setValidated] = useState(false)
     const [isPrivate, setIsPrivate] = useState(false);
 
-    const validateFields = () => {
-        console.log(validated);
-        
+    const validateFields = () => {        
         if(videoTitle.length > 5) {
             setValidated(true)
             createMuxUpload(videoTitle, isPrivate)

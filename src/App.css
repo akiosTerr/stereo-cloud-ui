@@ -3,4 +3,9 @@
   margin: 0 auto;
   padding: 2rem;
   text-align: center;
+  @media (max-width: 425px) {
+    padding: 0;
+    width: 100vw;
+  }
 }
+

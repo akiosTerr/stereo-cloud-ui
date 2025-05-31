@@ -7,7 +7,16 @@ type Props = {}
 
 const Wrapper = styled.div`
     width: 100%;
-    height: auto;
+    height: 93vh;
+    margin-top: 3rem;
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-start;
+    @media (max-width: 425px) {
+        height: 70vh;
+        align-items: center;
+        margin-top: 0;
+    }
 `
 
 function Player({ }: Props) {

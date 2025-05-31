@@ -4,6 +4,7 @@ import { useAuth } from './hooks/auth_hook'
 import { SetAuthCtx } from './Contexts'
 import VideoTable from './components/VideoTable'
 import Player from './components/Player'
+import { AiFillHome } from 'react-icons/ai'
 
 function App() {
   const { loggedIn, login, logout } = useAuth();
@@ -12,7 +13,7 @@ function App() {
     <>
         <SetAuthCtx.Provider value={{ isLoggedIn: loggedIn, login, logout }}>
           <nav>
-            <Link to="/">Home</Link> | <Link to="/upload">Upload</Link>
+            <Link to="/"><AiFillHome size={24}/></Link>
           </nav>
           <Routes>
             <Route path="/" element={<VideoTable/>} />

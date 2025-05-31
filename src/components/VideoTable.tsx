@@ -110,7 +110,7 @@ const VideoTable = () => {
     <>
       <Title>Upload Video</Title>
       <Uploader onSuccess={updateVideos}/>
-      <Title>View Videos</Title>
+      <Title>Public Videos</Title>
       <GridVideo>
         {videos.map((item) => (
           <VideoBlock key={item.id}>
