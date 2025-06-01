@@ -33,6 +33,26 @@ export const getMuxAssets = async (): Promise<VideoAsset[]> => {
     return data;
 };
 
+export const getMuxPrivateAssets = async (): Promise<VideoAsset[]> => {
+    let token = Cookies.get('jwtToken');
+    
+    if (!token) {
+        token = "";
+    }
+
+    const response = await fetch('http://localhost:3000/mux/private',
+        {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            }
+        });
+
+    const data = await response.json();
+    return data;
+};
+
 export const getMuxVideos = async (): Promise<VideoAsset[]> => {
     let token = Cookies.get('jwtToken');
     
