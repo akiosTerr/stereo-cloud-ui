@@ -1,9 +1,9 @@
 import { createContext, useContext } from "react"
 
-interface ProfileNameContextType {
-    setProfileName: React.Dispatch<React.SetStateAction<string>>
-    profileName: string
-}
+// interface ProfileNameContextType {
+//     setProfileName: React.Dispatch<React.SetStateAction<string>>
+//     profileName: string
+// }
 
 interface AuthContextType {
     isLoggedIn: boolean

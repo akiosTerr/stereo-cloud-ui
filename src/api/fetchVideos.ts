@@ -13,6 +13,11 @@ export type VideoAsset = {
     updated_at: string
   }
 
+const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+
+console.log("apiUrl: ", import.meta.env.VITE_API_URL);
+
+
 export const getMuxAssets = async (): Promise<VideoAsset[]> => {
     let token = Cookies.get('jwtToken');
     
@@ -20,7 +25,7 @@ export const getMuxAssets = async (): Promise<VideoAsset[]> => {
         token = "";
     }
 
-    const response = await fetch('http://localhost:3000/mux/',
+    const response = await fetch(`${apiUrl}/mux/`,
         {
             method: 'GET',
             headers: {
@@ -40,7 +45,7 @@ export const getMuxPrivateAssets = async (): Promise<VideoAsset[]> => {
         token = "";
     }
 
-    const response = await fetch('http://localhost:3000/mux/private',
+    const response = await fetch(`${apiUrl}/mux/private`,
         {
             method: 'GET',
             headers: {
@@ -60,7 +65,7 @@ export const getMuxVideos = async (): Promise<VideoAsset[]> => {
         token = "";
     }
 
-    const response = await fetch('http://localhost:3000/mux/assets',
+    const response = await fetch(`${apiUrl}/mux/assets`,
         {
             method: 'GET',
             headers: {
@@ -87,7 +92,7 @@ export const fetchVideoToken = async (playback_id?: string) => {
         token = "";
     }
 
-    const response = await fetch(`http://localhost:3000/mux/sign/${playback_id}`,
+    const response = await fetch(`${apiUrl}/mux/sign/${playback_id}`,
         {
             method: 'POST',
             headers: {
@@ -112,7 +117,7 @@ export const fetchVideoInfo = async (id?: string) => {
         token = "";
     }
 
-    const response = await fetch(`http://localhost:3000/mux/${id}`,
+    const response = await fetch(`${apiUrl}/mux/${id}`,
         {
             method: 'GET',
             headers: {

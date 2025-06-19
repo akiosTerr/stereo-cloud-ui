@@ -1,12 +1,13 @@
-
 import Cookies from "js-cookie";
+
+const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
 export const deleteMuxVideo = async (id: string, asset_id: string) => {
   let token = Cookies.get('jwtToken');
   if (!token) {
     token = ""
   }
-  const response = await fetch(`http://localhost:3000/mux/${id}/${asset_id}`,
+  const response = await fetch(`${apiUrl}/mux/${id}/${asset_id}`,
     {
       method: 'DELETE',
       headers: {

@@ -14,13 +14,14 @@ export type MuxUploadResponse = {
   };
 };
 
+const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
 export const createMuxUpload = async (videoTitle: string, isPrivate: boolean): Promise<MuxUploadResponse> => {
   let token = Cookies.get('jwtToken');
   if (!token) {
     token = ""
   }
-  const response = await fetch('http://localhost:3000/mux/upload',
+  const response = await fetch(`${apiUrl}/mux/upload`,
     {
       method: 'POST',
       headers: {

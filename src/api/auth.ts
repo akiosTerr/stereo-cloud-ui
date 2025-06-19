@@ -7,6 +7,8 @@ export interface AuthResponse {
     access_token: string
 }
 
+const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+
 const GetLoginToken = async ({ email, password }: LoginData, login: Function, setError: Function, setIsLoading: Function) => {
     if (!email || !password) {
         setError('Email and password are required.');
@@ -17,7 +19,7 @@ const GetLoginToken = async ({ email, password }: LoginData, login: Function, se
     setError('');
 
     try {
-        const response = await fetch('http://localhost:3000/auth/login', {
+        const response = await fetch(`${apiUrl}/auth/login`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
