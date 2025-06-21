@@ -94,6 +94,12 @@ load_env_file() {
     local file="$1"
     local count=0
     
+    # Check if file is readable
+    if [[ ! -r "$file" ]]; then
+        echo -e "${RED}Error: Environment file '$file' is not readable.${NC}"
+        return 1
+    fi
+    
     # Read the file line by line
     while IFS= read -r line || [[ -n "$line" ]]; do
         # Remove leading/trailing whitespace
@@ -123,26 +129,32 @@ load_env_file() {
         fi
     done < "$file"
     
-    return $count
+    # Store count in a global variable and return 0 for success
+    ENV_VAR_COUNT=$count
+    return 0
 }
 
 # Load environment variables
 if load_env_file "$ENV_FILE"; then
-    env_count=$?
-    echo -e "${GREEN}Successfully loaded $env_count environment variables${NC}"
+    echo -e "${GREEN}Successfully loaded $ENV_VAR_COUNT environment variables${NC}"
 else
     echo -e "${RED}Failed to load environment file${NC}"
     exit 1
 fi
 
-# Check if docker-compose is available
-if ! command -v docker-compose &> /dev/null; then
-    echo -e "${RED}Error: docker-compose is not installed or not in PATH${NC}"
+# Check if docker-compose is available (try both v1 and v2)
+DOCKER_COMPOSE_CMD=""
+if command -v docker-compose &> /dev/null; then
+    DOCKER_COMPOSE_CMD="docker-compose"
+    echo -e "${GREEN}Using standalone docker-compose${NC}"
+elif docker compose version &> /dev/null; then
+    DOCKER_COMPOSE_CMD="docker compose"
+    echo -e "${GREEN}Using docker compose (v2)${NC}"
+else
+    echo -e "${RED}Error: Neither 'docker-compose' nor 'docker compose' is available${NC}"
+    echo -e "${YELLOW}Please install Docker Compose: https://docs.docker.com/compose/install/${NC}"
     exit 1
 fi
-
-# Build Docker Compose command
-DOCKER_COMPOSE_CMD="docker-compose"
 
 # Add compose file if different from default
 if [[ "$COMPOSE_FILE" != "docker-compose.yml" ]]; then
@@ -176,4 +188,4 @@ else
     exit $exit_code
 fi
 
-echo -e "\n${GREEN}Script completed!${NC}" 
+echo -e "\n${GREEN}Script completed!${NC}"
