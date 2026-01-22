@@ -30,7 +30,7 @@ const GetLoginToken = async ({ email, password }: LoginData, login: Function, se
         const data = await response.json();
 
         if (!response.ok) {
-            throw new Error(data.message || 'Login failed');
+            throw new Error(data.message || 'Login failed');            
         }
         
         login(data.access_token)
@@ -40,5 +40,21 @@ const GetLoginToken = async ({ email, password }: LoginData, login: Function, se
         setIsLoading(false);
     }
 }
+
+export const validateToken = async (token: string): Promise<boolean> => {
+    try {
+        const response = await fetch(`${apiUrl}/auth/validateToken`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            }
+        });
+
+        return response.ok;
+    } catch (error) {
+        return false;
+    }
+};
 
 export default GetLoginToken

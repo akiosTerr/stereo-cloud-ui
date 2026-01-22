@@ -9,6 +9,9 @@ import { deleteMuxVideo } from "../api/deleteVideo";
 const Title = styled.h2`
   color: #00ec27;
 `
+const Title2 = styled.h2`
+  color: #9521f3;
+`
 const GridVideo = styled.div`
   display: grid;
   grid-gap: 10px;
@@ -132,7 +135,7 @@ const VideoTable = () => {
           </VideoBlock>
         ))}
       </GridVideo>
-      <Title>Private Videos</Title>
+      <Title2>Private Videos</Title2>
       <GridVideo>
         {privateVideos.map((item) => (
           <VideoBlock key={item.id}>

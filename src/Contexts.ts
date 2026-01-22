@@ -6,7 +6,7 @@ import { createContext, useContext } from "react"
 // }
 
 interface AuthContextType {
-    isLoggedIn: boolean
+    isLoggedIn: Function
     login: Function
     logout: Function
 }

@@ -1,16 +1,9 @@
 import Cookies from "js-cookie";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
+import { validateToken } from "../api/auth";
 
 export const useAuth = () => {
     const [loggedIn, setLoggedIn] = useState(false);
-    useEffect(() => {
-      const token = Cookies.get('jwtToken');
-      if (token) {
-        setLoggedIn(true);
-      } else {
-        logout();
-      }
-    }, [loggedIn]);
   
     const login = (token: string) => {
       const expirationDate = new Date();
@@ -19,10 +12,25 @@ export const useAuth = () => {
       setLoggedIn(true);
     };
   
-    const logout = () => {
+    const logout = useCallback(() => {
       Cookies.remove('jwtToken');
       setLoggedIn(false);
-    };
+    }, []);
+
+    useEffect(() => {
+      const token = Cookies.get('jwtToken');
+      if (token) {
+        validateToken(token).then((isValid) => {
+          if (isValid) {
+            setLoggedIn(true);
+          } else {
+            logout();
+          }
+        });
+      } else {
+        logout();
+      }
+    }, [logout]);
   
     return { loggedIn, login, logout };
   };
