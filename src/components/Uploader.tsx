@@ -9,6 +9,10 @@ const WrapUploader = styled.div`
     margin: auto;
 `
 
+const Title = styled.h2`
+  color: #00ec27;
+`
+
 const ToggleContainer = styled.div`
     display: flex;
     align-items: center;
@@ -81,7 +85,7 @@ const ToggleLabel = styled.span<ToggleLabelProps>`
 `
 
 interface UploaderProps {
-    onSuccess: Function
+    onSuccess?: Function
 }
 
 function Uploader({onSuccess}: UploaderProps) {
@@ -105,11 +109,12 @@ function Uploader({onSuccess}: UploaderProps) {
     const onSuccessUplodHandler = (e: any) => {
         console.log('success');
         console.log(e.target.type);
-        onSuccess()
+        onSuccess?.()
     }
 
     return (
         <WrapUploader>
+            <Title>Upload Video</Title>
             <ToggleContainer>
                 <ToggleSwitch>
                     <ToggleInput

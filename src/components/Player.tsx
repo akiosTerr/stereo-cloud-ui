@@ -6,10 +6,10 @@ import styled from "styled-components";
 type Props = {}
 
 const Wrapper = styled.div`
-    width: 100%;
-    height: 93vh;
-    margin-top: 3rem;
+    width: 75vw;
+    margin-top: 1rem;
     display: flex;
+    flex-direction: column;
     justify-content: flex-start;
     align-items: flex-start;
     @media (max-width: 425px) {
@@ -17,6 +17,14 @@ const Wrapper = styled.div`
         align-items: center;
         margin-top: 0;
     }
+`
+
+const Description = styled.p`
+    color: #fff;
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin-top: 1rem;
+    text-align: center;
 `
 
 function Player({ }: Props) {
@@ -44,6 +52,7 @@ function Player({ }: Props) {
                     viewer_user_id: 'Placeholder (optional)',
                 }}
             />
+            <Description>Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.</Description>
         </Wrapper>
     )
 }

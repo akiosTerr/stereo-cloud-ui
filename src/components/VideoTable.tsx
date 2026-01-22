@@ -3,7 +3,6 @@ import withAuth from "../hoc/PrivateRoute";
 import { fetchVideoToken, getMuxAssets, getMuxPrivateAssets, VideoAsset } from "../api/fetchVideos";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
-import Uploader from "./Uploader";
 import { deleteMuxVideo } from "../api/deleteVideo";
 
 const Title = styled.h2`
@@ -15,7 +14,7 @@ const Title2 = styled.h2`
 const GridVideo = styled.div`
   display: grid;
   grid-gap: 10px;
-  grid-template-columns:  repeat(5, 1fr);
+  grid-template-columns:  repeat(3, 1fr);
 `
 const ButtonRow = styled.div`
   display: flex;
@@ -24,25 +23,33 @@ const ButtonRow = styled.div`
 `
 
 const DeleteButton = styled.button`
-  color: white;
-  background-color: red;
+  color: red;
+  background-color: transparent;
+  border: 1px solid transparent;
+  &:hover {
+    border: 1px solid red;
+  }
 `
 
 const ShareButton = styled.button`
-  color: white;
-  background-color: #04da04;
+  color: #04da04;
+  background-color: transparent;
+  border: 1px solid transparent;
+  &:hover {
+    border: 1px solid #04da04;
+  }
 `
 
 const VideoThumbnail = styled.img`
   cursor: pointer;
-  width: 214px;
-  height: 121px;
+  width: 445px;
+  height: 250px;
 `
 
 const VideoBlock = styled.div`
   display: flex;
   flex-direction: column;
-  background-color: gray;
+  background-color: #000;
   padding: 10px;
   border-radius: 0.6rem;
 `
@@ -60,10 +67,10 @@ const VideoTable = () => {
 
   const getThumbUrl = (id: string, isPrivate: boolean = false) => {
     if (!isPrivate) {
-      return `https://image.mux.com/${id}/thumbnail.png?width=214&height=121&time=2`
+      return `https://image.mux.com/${id}/thumbnail.png?width=445&height=250&time=2`
     } else {
       const token = isPrivate ? privateVideos.find(v => v.playback_id === id)?.tokenThumbnail : null
-      return `https://image.mux.com/${id}/thumbnail.png?width=214&height=121&time=2&token=${token}`
+      return `https://image.mux.com/${id}/thumbnail.png?width=445&height=250&time=2&token=${token}`
     }
   }
 
@@ -115,8 +122,6 @@ const VideoTable = () => {
 
   return (
     <>
-      <Title>Upload Video</Title>
-      <Uploader onSuccess={updateVideos}/>
       <Title>Public Videos</Title>
       <GridVideo>
         {videos.map((item) => (
@@ -126,7 +131,7 @@ const VideoTable = () => {
                 handleRedirectVideo(item.playback_id, item.isPrivate);
               }} src={getThumbUrl(item.playback_id, item.isPrivate)} alt="" />
               <h2>{item.title}</h2>
-              <p>{item.status}</p>
+              {/* <p>{item.status}</p> */}
             </div>
             <ButtonRow>
               <DeleteButton onClick={() => handleDelete(item.id, item.asset_id)}>Delete</DeleteButton>
@@ -144,7 +149,7 @@ const VideoTable = () => {
                 handleRedirectVideo(item.playback_id, item.isPrivate);
               }} src={getThumbUrl(item.playback_id, item.isPrivate)} alt="" />
               <h2>{item.title}</h2>
-              <p>{item.status}</p>
+              {/* <p>{item.status}</p> */}
             </div>
             <ButtonRow>
               <DeleteButton onClick={() => handleDelete(item.id, item.asset_id)}>Delete</DeleteButton>
