@@ -16,7 +16,7 @@ export type MuxUploadResponse = {
 
 const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
-export const createMuxUpload = async (videoTitle: string, isPrivate: boolean): Promise<MuxUploadResponse> => {
+export const createMuxUpload = async (videoTitle: string, description: string, isPrivate: boolean): Promise<MuxUploadResponse> => {
   let token = Cookies.get('jwtToken');
   if (!token) {
     token = ""
@@ -30,6 +30,7 @@ export const createMuxUpload = async (videoTitle: string, isPrivate: boolean): P
       },
       body: JSON.stringify({
         title: videoTitle,
+        description: description || '',
         isPrivate
       })
     });

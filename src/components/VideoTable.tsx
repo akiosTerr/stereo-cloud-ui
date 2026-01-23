@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import withAuth from "../hoc/PrivateRoute";
-import { fetchVideoToken, getMuxAssets, getMuxPrivateAssets, VideoAsset } from "../api/fetchVideos";
+import { fetchVideoToken, FormatedVideoAsset, getMuxAssets, getMuxPrivateAssets, VideoAsset } from "../api/fetchVideos";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { deleteMuxVideo } from "../api/deleteVideo";
@@ -54,7 +54,7 @@ const VideoBlock = styled.div`
   border-radius: 0.6rem;
 `
 
-type VideoAssetWithTokens = VideoAsset & {
+type VideoAssetWithTokens = FormatedVideoAsset & {
     tokenVideo?: string;
     tokenThumbnail?: string;
 }
@@ -62,7 +62,7 @@ type VideoAssetWithTokens = VideoAsset & {
 
 const VideoTable = () => {
   const navigate = useNavigate();
-  const [videos, setVideos] = useState<VideoAsset[]>([])
+  const [videos, setVideos] = useState<FormatedVideoAsset[]>([])
   const [privateVideos, setPrivateVideos] = useState<VideoAssetWithTokens[]>([])
 
   const getThumbUrl = (id: string, isPrivate: boolean = false) => {
@@ -74,16 +74,16 @@ const VideoTable = () => {
     }
   }
 
-  const handleRedirectVideo = (playbackId: string, isPrivate: boolean = false) => {
+  const handleRedirectVideo = (playbackId: string, isPrivate: boolean = false, description: string = '') => {
    if(isPrivate) {  
     const token = privateVideos.find(v => v.playback_id === playbackId)?.tokenVideo
-    navigate('/player', { state: { playbackId, token } });
+    navigate(`/player/${playbackId}`, { state: { token, description } });
    } else {
-    navigate('/player', { state: { playbackId } });
+    navigate(`/player/${playbackId}`, { state: { description } });
    }
   };
 
-  const signTokens = async (data: VideoAsset[]) => {
+  const signTokens = async (data: FormatedVideoAsset[]) => {
     const promises = data.map(async(item) => {
         const {tokenVideo, tokenThumbnail} = await fetchVideoToken(item.playback_id)
         return {
@@ -128,7 +128,7 @@ const VideoTable = () => {
           <VideoBlock key={item.id}>
             <div>
               <VideoThumbnail onClick={() => {
-                handleRedirectVideo(item.playback_id, item.isPrivate);
+                handleRedirectVideo(item.playback_id, item.isPrivate, item.description);
               }} src={getThumbUrl(item.playback_id, item.isPrivate)} alt="" />
               <h2>{item.title}</h2>
               {/* <p>{item.status}</p> */}
@@ -146,7 +146,7 @@ const VideoTable = () => {
           <VideoBlock key={item.id}>
             <div>
               <VideoThumbnail onClick={() => {
-                handleRedirectVideo(item.playback_id, item.isPrivate);
+                handleRedirectVideo(item.playback_id, item.isPrivate, item.description);
               }} src={getThumbUrl(item.playback_id, item.isPrivate)} alt="" />
               <h2>{item.title}</h2>
               {/* <p>{item.status}</p> */}

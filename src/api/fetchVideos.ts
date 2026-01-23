@@ -1,6 +1,6 @@
 import Cookies from "js-cookie";
 
-export type VideoAsset = {
+export type FormatedVideoAsset = {
     id: string,
     user_id: string,
     upload_id: string,
@@ -8,6 +8,23 @@ export type VideoAsset = {
     isPrivate: boolean,
     playback_id: string,
     title: string,
+    description: string,
+    status: string,
+    created_at: string,
+    updated_at: string
+  }
+
+export type VideoAsset = {
+    id: string,
+    user_id: string,
+    upload_id: string,
+    asset_id: string,
+    isPrivate: boolean,
+    playback_ids: { id: string, policy: string }[],
+    meta: {
+        title: string,
+    },
+    description: string,
     status: string,
     created_at: string,
     updated_at: string
@@ -18,7 +35,7 @@ const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 console.log("apiUrl: ", import.meta.env.VITE_API_URL);
 
 
-export const getMuxAssets = async (): Promise<VideoAsset[]> => {
+export const getMuxAssets = async (): Promise<FormatedVideoAsset[]> => {
     let token = Cookies.get('jwtToken');
     
     if (!token) {
@@ -89,8 +106,6 @@ export const fetchVideoToken = async (playback_id?: string) => {
     }
 
      let token = Cookies.get('jwtToken');
-     console.log(playback_id);
-     
     
     if (!token) {
         token = "";
