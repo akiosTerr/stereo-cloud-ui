@@ -5,10 +5,11 @@ import { validateToken } from "../api/auth";
 export const useAuth = () => {
     const [loggedIn, setLoggedIn] = useState(false);
   
-    const login = (token: string) => {
+    const login = (token: string, channel_name: string) => {
       const expirationDate = new Date();
       expirationDate.setTime(expirationDate.getTime() + 6 * 60 * 60 * 1000);
       Cookies.set('jwtToken', token, { expires: expirationDate});
+      Cookies.set('channel_name', channel_name, { expires: expirationDate});
       setLoggedIn(true);
     };
   

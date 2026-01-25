@@ -14,7 +14,7 @@ function App() {
   return (
     <>
       <SetAuthCtx.Provider value={{ isLoggedIn: loggedIn, login, logout }}>
-        <Navbar />
+        {loggedIn && <Navbar />}
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/profile" element={<VideoTable />} />

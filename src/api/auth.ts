@@ -33,7 +33,7 @@ const GetLoginToken = async ({ email, password }: LoginData, login: Function, se
             throw new Error(data.message || 'Login failed');            
         }
         
-        login(data.access_token)
+        login(data.access_token, data.channel_name)
     } catch (err: any) {
         setError(err.message || 'Something went wrong');
     } finally {

@@ -136,7 +136,7 @@ function Uploader({onSuccess}: UploaderProps) {
                 onBlur={validateFields}
             />
             <TextArea
-                placeholder="description (optional)"
+                placeholder="description"
                 onChange={(e) => setDescription(e.target.value)}
                 onBlur={validateFields}
             />

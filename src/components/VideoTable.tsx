@@ -4,6 +4,7 @@ import { fetchVideoToken, FormatedVideoAsset, getMuxAssets, getMuxPrivateAssets,
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { deleteMuxVideo } from "../api/deleteVideo";
+import Cookies from "js-cookie";
 
 const Title = styled.h2`
   color: #00ec27;
@@ -11,10 +12,20 @@ const Title = styled.h2`
 const Title2 = styled.h2`
   color: #9521f3;
 `
+const ChannelName = styled.h2`
+  color: #fff;
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+`
+
 const GridVideo = styled.div`
   display: grid;
   grid-gap: 10px;
   grid-template-columns:  repeat(3, 1fr);
+  @media (max-width: 768px) {
+    grid-template-columns:  repeat(1, 1fr);
+  }
 `
 const ButtonRow = styled.div`
   display: flex;
@@ -42,8 +53,12 @@ const ShareButton = styled.button`
 
 const VideoThumbnail = styled.img`
   cursor: pointer;
-  width: 445px;
+  width: 100%;
   height: 250px;
+  @media (max-width: 480px) {
+    width: 400px;
+    margin: 0 auto;
+  }
 `
 
 const VideoBlock = styled.div`
@@ -94,6 +109,15 @@ const VideoTable = () => {
     })
     return Promise.all(promises)
   }
+
+  const getChannelName = () => {
+    const channelName = Cookies.get('channel_name')
+    if (channelName) {
+      return channelName
+    } else {
+      return ''
+    }
+  }
  
   const updateVideos = async () => {
     const data = await getMuxAssets();
@@ -122,6 +146,7 @@ const VideoTable = () => {
 
   return (
     <>
+      <ChannelName>{getChannelName()}</ChannelName>
       <Title>Public Videos</Title>
       <GridVideo>
         {videos.map((item) => (

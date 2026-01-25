@@ -9,6 +9,7 @@ export type FormatedVideoAsset = {
     playback_id: string,
     title: string,
     description: string,
+    channel_name?: string,
     status: string,
     created_at: string,
     updated_at: string
@@ -59,7 +60,7 @@ export const getMuxAssets = async (): Promise<FormatedVideoAsset[]> => {
     return data;
 };
 
-export const getMuxPrivateAssets = async (): Promise<VideoAsset[]> => {
+export const getMuxPrivateAssets = async (): Promise<FormatedVideoAsset[]> => {
     let token = Cookies.get('jwtToken');
     
     if (!token) {
@@ -79,14 +80,14 @@ export const getMuxPrivateAssets = async (): Promise<VideoAsset[]> => {
     return data;
 };
 
-export const getMuxVideos = async (): Promise<VideoAsset[]> => {
+export const getMuxVideos = async (): Promise<FormatedVideoAsset[]> => {
     let token = Cookies.get('jwtToken');
     
     if (!token) {
         token = "";
     }
 
-    const response = await fetch(`${apiUrl}/mux/assets`,
+    const response = await fetch(`${apiUrl}/mux/home`,
         {
             method: 'GET',
             headers: {
