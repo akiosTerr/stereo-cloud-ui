@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
 import withAuth from "../hoc/PrivateRoute";
-import { fetchVideoToken, FormatedVideoAsset, getMuxAssets, getMuxPrivateAssets, VideoAsset } from "../api/fetchVideos";
+import { fetchVideoToken, FormatedVideoAsset, getMuxAssets, getMuxPrivateAssets } from "../api/fetchVideos";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { deleteMuxVideo } from "../api/deleteVideo";
 import Cookies from "js-cookie";
+
 
 const Title = styled.h2`
   color: #00ec27;
@@ -41,6 +42,10 @@ const ButtonRow = styled.div`
   display: flex;
   flex-direction: row;
   justify-content: space-between;
+  background-color: #333;
+  padding: 10px;
+  border-radius: 0.6rem;
+  border: 1px solid transparent;
 `
 
 const DeleteButton = styled.button`
@@ -157,6 +162,7 @@ const VideoTable = () => {
     if (confirm("delete this?")) {
       await deleteMuxVideo(id, asset_id)
       updateVideos()
+      updatePrivateVideos()
     } else {
       console.log("canceled");
     }
@@ -174,7 +180,6 @@ const VideoTable = () => {
                 handleRedirectVideo(item.playback_id, item.isPrivate, item.description);
               }} src={getThumbUrl(item.playback_id, item.isPrivate)} alt="" />
               <h2>{item.title}</h2>
-              {/* <p>{item.status}</p> */}
             </div>
             <ButtonRow>
               <DeleteButton onClick={() => handleDelete(item.id, item.asset_id)}>Delete</DeleteButton>
@@ -192,7 +197,6 @@ const VideoTable = () => {
                 handleRedirectVideo(item.playback_id, item.isPrivate, item.description);
               }} src={getThumbUrl(item.playback_id, item.isPrivate)} alt="" />
               <h2>{item.title}</h2>
-              {/* <p>{item.status}</p> */}
             </div>
             <ButtonRow>
               <DeleteButton onClick={() => handleDelete(item.id, item.asset_id)}>Delete</DeleteButton>

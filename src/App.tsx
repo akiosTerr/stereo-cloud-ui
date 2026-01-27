@@ -7,6 +7,7 @@ import Player from './components/Player'
 import Uploader from './components/Uploader'
 import Navbar from './components/Navbar'
 import Home from './components/Home'
+import ProfilePage from './pages/ProfilePage'
 
 function App() {
   const { loggedIn, login, logout } = useAuth();
@@ -17,7 +18,8 @@ function App() {
         {loggedIn && <Navbar />}
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/profile" element={<VideoTable />} />
+          <Route path="/dashboard" element={<VideoTable />} />
+          <Route path="/profile/:channel_name" element={<ProfilePage />} />
           <Route path="/player/:playbackId" element={<Player />} />
           <Route path="/upload/" element={<Uploader />} />
         </Routes>

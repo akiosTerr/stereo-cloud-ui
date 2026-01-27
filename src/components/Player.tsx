@@ -46,6 +46,7 @@ function Player({ }: Props) {
         <Wrapper>
             <MuxPlayer
                 style={{ width: '100%', height: '90vh' }}
+                accentColor="#9521f3"
                 tokens={getToken()}
                 playbackId={playbackId}
                 metadata={{

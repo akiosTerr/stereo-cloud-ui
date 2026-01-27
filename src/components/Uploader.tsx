@@ -2,7 +2,7 @@ import MuxUploader from "@mux/mux-uploader-react";
 import { useState } from "react";
 import { createMuxUpload } from "../api/createEndpoint";
 import styled from "styled-components";
-import { TextArea, TextInput } from "../style";
+import { DescriptionInput, TextInput } from "../style";
 
 const WrapUploader = styled.div`
     width: 367px;
@@ -96,7 +96,7 @@ function Uploader({onSuccess}: UploaderProps) {
     const [isPrivate, setIsPrivate] = useState(false);
 
     const validateFields = () => {        
-        if(videoTitle.length > 5 && description.length > 0) {
+        if(videoTitle.length > 3) {
             setValidated(true)
             createMuxUpload(videoTitle, description, isPrivate)
             .then(res => {
@@ -135,7 +135,7 @@ function Uploader({onSuccess}: UploaderProps) {
                 onChange={(e) => setVideoTitle(e.target.value)}
                 onBlur={validateFields}
             />
-            <TextArea
+            <DescriptionInput
                 placeholder="description"
                 onChange={(e) => setDescription(e.target.value)}
                 onBlur={validateFields}

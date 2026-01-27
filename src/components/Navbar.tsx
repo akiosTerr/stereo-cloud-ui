@@ -24,7 +24,7 @@ function Navbar({ }: Props) {
         <WrapNavbar>
             <LinkNavbar to="/"><AiOutlineHome  size={24} /></LinkNavbar>
             <LinkNavbar to="/upload"><AiOutlineUpload size={24} /></LinkNavbar>
-            <LinkNavbar to="/profile"><AiOutlineUser size={24} /></LinkNavbar>
+            <LinkNavbar to="/dashboard"><AiOutlineUser size={24} /></LinkNavbar>
         </WrapNavbar>
     )
 }

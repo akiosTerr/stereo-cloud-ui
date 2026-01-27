@@ -23,7 +23,7 @@ const FormWrapper = styled.div`
 const Form = styled.form`
   display: flex;
   flex-direction: column;
-
+  align-items: center;
 `;
 
 const Title = styled.h2`
@@ -34,9 +34,9 @@ const Title = styled.h2`
 `;
 
 const Button = styled.button`
-  width: 100%;
+  width: 80%;
   padding: 0.75rem;
-  background-color: #0077ff;
+  background-color: #9521f3;
   color: white;
   font-weight: bold;
   border: none;
@@ -44,7 +44,10 @@ const Button = styled.button`
   cursor: pointer;
 
   &:hover {
-    background-color: #005fcc;
+    background-color: #8c00af;
+  }
+  &:focus-visible {
+    background-color: #8c00af;
   }
 `;
 

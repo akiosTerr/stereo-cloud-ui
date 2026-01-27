@@ -12,7 +12,8 @@ export type FormatedVideoAsset = {
     channel_name?: string,
     status: string,
     created_at: string,
-    updated_at: string
+    updated_at: string,
+    duration?: number
   }
 
 export type VideoAsset = {
@@ -146,6 +147,26 @@ export const fetchVideoInfo = async (id?: string) => {
             }
         });
 
+    const data = await response.json();
+    return data;
+}
+
+export const fetchVideosByChannelName = async (channel_name?: string): Promise<FormatedVideoAsset[]> => {
+    if(!channel_name) {
+        return [];
+    }
+    let token = Cookies.get('jwtToken');
+    if (!token) {
+        token = "";
+    }
+    const response = await fetch(`${apiUrl}/mux/profile/${channel_name}`,
+        {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            }
+        });
     const data = await response.json();
     return data;
 }
