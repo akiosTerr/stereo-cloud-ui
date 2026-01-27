@@ -14,7 +14,7 @@ const Title2 = styled.h2`
 const GridVideo = styled.div`
   display: grid;
   grid-gap: 5px;
-  grid-template-columns:  repeat(4, 1fr);
+  grid-template-columns:  repeat(5, 1fr);
   @media (max-width: 1440px) {
     grid-template-columns:  repeat(3, 1fr);
   }
@@ -70,9 +70,30 @@ const VideoContent = styled.div`
   gap: 10px;
 `
 
+const Button = styled.button`
+  background-color: transparent;
+  color: #fff;
+  border: 1px solid #fff;
+  padding: 10px 20px;
+  border-radius: 0.6rem;
+  cursor: pointer;
+`
+const ButtonContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 20px;
+`
+const Loading = styled.p`
+  color: #fff;
+  margin: 0;
+`
 const Home = () => {
   const navigate = useNavigate();
   const [videos, setVideos] = useState<FormatedVideoAsset[]>([])
+  const [loading, setLoading] = useState(false)
+  const [currentPage, setCurrentPage] = useState(1)
+  const [hasMore, setHasMore] = useState(true)
 
   const getThumbUrl = (id: string) => {
     return `https://image.mux.com/${id}/thumbnail.png?width=445&height=250&time=2`
@@ -83,8 +104,30 @@ const Home = () => {
   };
 
   const updateVideos = async () => {
-    const data = await getMuxVideos();
+    setLoading(true);
+    const data = await getMuxVideos(1, 10);
     setVideos(data);
+    setCurrentPage(1);
+    setHasMore(data.length === 10);
+    setLoading(false);
+  }
+
+  const loadMoreVideos = async () => {
+    if (loading || !hasMore) return;
+    
+    setLoading(true);
+    const nextPage = currentPage + 1;
+    const data = await getMuxVideos(nextPage, 10);
+    
+    if (data.length === 0) {
+      setHasMore(false);
+    } else {
+      setVideos(prev => [...prev, ...data]);
+      setCurrentPage(nextPage);
+      setHasMore(data.length === 10);
+    }
+    
+    setLoading(false);
   }
 
   useEffect(() => {
@@ -92,19 +135,30 @@ const Home = () => {
   }, [])
 
   return (
-    <GridVideo>
-      {videos.map((item) => (
-        <VideoBlock key={item.id} onClick={() => {
-          handleRedirectVideo(item.playback_id, item.description);
-        }}>
-          <VideoThumbnail src={getThumbUrl(item.playback_id)} alt="" />
-          <VideoContent>
-            <VideoTitle>{item.title}</VideoTitle>
-            <VideoChannelName>{item.channel_name}</VideoChannelName>
-          </VideoContent>
-        </VideoBlock>
-      ))}
-    </GridVideo>
+    <>
+      <GridVideo>
+        {videos.map((item) => (
+          <VideoBlock key={item.id} onClick={() => {
+            handleRedirectVideo(item.playback_id, item.description);
+          }}>
+            <VideoThumbnail src={getThumbUrl(item.playback_id)} alt="" />
+            <VideoContent>
+              <VideoTitle>{item.title}</VideoTitle>
+              <VideoChannelName>{item.channel_name}</VideoChannelName>
+            </VideoContent>
+          </VideoBlock>
+        ))}
+      </GridVideo>
+      {hasMore && (
+        <ButtonContainer>
+          <Button onClick={() => {
+            loadMoreVideos()
+          }}>
+            {loading ? <Loading>Loading...</Loading> : 'Show More Videos'}
+          </Button>
+        </ButtonContainer>
+      )}
+    </>
   )
 }
 

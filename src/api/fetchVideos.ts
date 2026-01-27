@@ -78,16 +78,16 @@ export const getMuxPrivateAssets = async (): Promise<FormatedVideoAsset[]> => {
 
     const data = await response.json();
     return data;
-};
+};  
 
-export const getMuxVideos = async (): Promise<FormatedVideoAsset[]> => {
+export const getMuxVideos = async (page: number = 1, limit: number = 10): Promise<FormatedVideoAsset[]> => {
     let token = Cookies.get('jwtToken');
     
     if (!token) {
         token = "";
     }
 
-    const response = await fetch(`${apiUrl}/mux/home`,
+    const response = await fetch(`${apiUrl}/mux/home?page=${page}&limit=${limit}`,
         {
             method: 'GET',
             headers: {

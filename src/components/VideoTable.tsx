@@ -22,8 +22,18 @@ const ChannelName = styled.h2`
 const GridVideo = styled.div`
   display: grid;
   grid-gap: 10px;
-  grid-template-columns:  repeat(3, 1fr);
+  grid-template-columns:  repeat(5, 1fr);
+  @media (max-width: 1440px) {
+    grid-template-columns:  repeat(3, 1fr);
+  }
+   @media (max-width: 1024px) {
+    grid-template-columns:  repeat(2, 1fr);
+  }
   @media (max-width: 768px) {
+    grid-template-columns:  repeat(1, 1fr);
+  }
+ 
+  @media (max-width: 425px) {
     grid-template-columns:  repeat(1, 1fr);
   }
 `
@@ -55,23 +65,31 @@ const VideoThumbnail = styled.img`
   cursor: pointer;
   width: 100%;
   height: 250px;
+   @media (max-width: 768px) {
+    width: 445px;
+  }
   @media (max-width: 480px) {
     width: 400px;
-    margin: 0 auto;
   }
 `
 
 const VideoBlock = styled.div`
   display: flex;
   flex-direction: column;
-  background-color: #000;
+  background-color: transparent;
   padding: 10px;
   border-radius: 0.6rem;
+  border: 1px solid transparent;
+  max-width: 420px;
+  margin: 0 auto;
+  &:hover {
+    border: 1px solid #fff;
+  }
 `
 
 type VideoAssetWithTokens = FormatedVideoAsset & {
-    tokenVideo?: string;
-    tokenThumbnail?: string;
+  tokenVideo?: string;
+  tokenThumbnail?: string;
 }
 
 
@@ -90,22 +108,22 @@ const VideoTable = () => {
   }
 
   const handleRedirectVideo = (playbackId: string, isPrivate: boolean = false, description: string = '') => {
-   if(isPrivate) {  
-    const token = privateVideos.find(v => v.playback_id === playbackId)?.tokenVideo
-    navigate(`/player/${playbackId}`, { state: { token, description } });
-   } else {
-    navigate(`/player/${playbackId}`, { state: { description } });
-   }
+    if (isPrivate) {
+      const token = privateVideos.find(v => v.playback_id === playbackId)?.tokenVideo
+      navigate(`/player/${playbackId}`, { state: { token, description } });
+    } else {
+      navigate(`/player/${playbackId}`, { state: { description } });
+    }
   };
 
   const signTokens = async (data: FormatedVideoAsset[]) => {
-    const promises = data.map(async(item) => {
-        const {tokenVideo, tokenThumbnail} = await fetchVideoToken(item.playback_id)
-        return {
-          ...item,
-          tokenVideo,
-          tokenThumbnail
-        }
+    const promises = data.map(async (item) => {
+      const { tokenVideo, tokenThumbnail } = await fetchVideoToken(item.playback_id)
+      return {
+        ...item,
+        tokenVideo,
+        tokenThumbnail
+      }
     })
     return Promise.all(promises)
   }
@@ -118,7 +136,7 @@ const VideoTable = () => {
       return ''
     }
   }
- 
+
   const updateVideos = async () => {
     const data = await getMuxAssets();
     setVideos(data);
