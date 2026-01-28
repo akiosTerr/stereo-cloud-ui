@@ -3,7 +3,8 @@ import withAuth from "../hoc/PrivateRoute";
 import { FormatedVideoAsset, getMuxVideos } from "../api/fetchVideos";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
-import { GridVideo, VideoBlock, VideoChannelName, VideoContent, VideoDuration, VideoThumbnail, VideoTitle } from "../style";
+import { AiOutlineSearch } from "react-icons/ai";
+import { GridVideo, VideoBlock, VideoChannelName, VideoContent, VideoDuration, VideoThumbnail, VideoTitle, TextInput } from "../style";
 
 
 const Button = styled.button`
@@ -31,12 +32,47 @@ const VideoInfoContainer = styled.div`
   justify-content: space-between;
   align-items: center;
 `
+const SearchContainer = styled.div`
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto 2rem auto;
+  display: flex;
+  justify-content: center;
+  position: relative;
+`
+const SearchInput = styled(TextInput)`
+  width: 100%;
+  background-color: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  padding: 0.75rem 3rem 0.75rem 1rem;
+  font-size: 1rem;
+  
+  &::placeholder {
+    color: rgba(255, 255, 255, 0.6);
+  }
+  
+  &:focus {
+    border-color: #9521f3;
+    background-color: rgba(255, 255, 255, 0.15);
+  }
+`
+const SearchIcon = styled(AiOutlineSearch)`
+  position: absolute;
+  right: 1rem;
+  top: 1.5rem;
+  transform: translateY(-50%);
+  color: #fff;
+  font-size: 1.25rem;
+  pointer-events: none;
+`
 const Home = () => {
   const navigate = useNavigate();
   const [videos, setVideos] = useState<FormatedVideoAsset[]>([])
   const [loading, setLoading] = useState(false)
   const [currentPage, setCurrentPage] = useState(1)
   const [hasMore, setHasMore] = useState(true)
+  const [searchQuery, setSearchQuery] = useState("")
 
   const getThumbUrl = (id: string) => {
     return `https://image.mux.com/${id}/thumbnail.png?width=445&height=250&time=2`
@@ -84,10 +120,23 @@ const Home = () => {
     updateVideos()
   }, [])
 
+  const filteredVideos = videos.filter((video) =>
+    video.title.toLowerCase().includes(searchQuery.toLowerCase())
+  )
+
   return (
     <>
+      <SearchContainer>
+        <SearchInput
+          type="text"
+          placeholder="Search videos by title..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+        />
+        <SearchIcon />
+      </SearchContainer>
       <GridVideo>
-        {videos.map((item) => (
+        {filteredVideos.map((item) => (
           <VideoBlock key={item.id} >
             <VideoThumbnail onClick={() => {
               handleRedirectVideo(item.playback_id, item.description);
@@ -106,13 +155,18 @@ const Home = () => {
           </VideoBlock>
         ))}
       </GridVideo>
-      {hasMore && (
+      {hasMore && !searchQuery && (
         <ButtonContainer>
           <Button onClick={() => {
             loadMoreVideos()
           }}>
             {loading ? <Loading>Loading...</Loading> : 'Show More Videos'}
           </Button>
+        </ButtonContainer>
+      )}
+      {searchQuery && filteredVideos.length === 0 && (
+        <ButtonContainer>
+          <Loading>No videos found matching "{searchQuery}"</Loading>
         </ButtonContainer>
       )}
     </>

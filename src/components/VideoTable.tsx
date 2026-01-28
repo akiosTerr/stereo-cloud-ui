@@ -19,6 +19,12 @@ const Title3 = styled.h2`
   color: #00bfff;
   margin-top: 2rem;
 `
+const VideoTitle = styled.p`
+  color: #fff;
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+`
 const ChannelName = styled.h2`
   color: #fff;
   font-size: 1.5rem;
@@ -220,7 +226,7 @@ const VideoTable = () => {
               <VideoThumbnail onClick={() => {
                 handleRedirectVideo(item.playback_id, item.isPrivate, item.description);
               }} src={getThumbUrl(item.playback_id, item.isPrivate)} alt="" />
-              <h2>{item.title}</h2>
+              <VideoTitle>{item.title}</VideoTitle>
             </div>
             <ButtonRow>
               <DeleteButton onClick={() => handleDelete(item.id, item.asset_id)}>Delete</DeleteButton>
@@ -237,7 +243,7 @@ const VideoTable = () => {
               <VideoThumbnail onClick={() => {
                 handleRedirectVideo(item.playback_id, item.isPrivate, item.description);
               }} src={getThumbUrl(item.playback_id, item.isPrivate)} alt="" />
-              <h2>{item.title}</h2>
+              <VideoTitle>{item.title}</VideoTitle>
             </div>
             <ButtonRow>
               <DeleteButton onClick={() => handleDelete(item.id, item.asset_id)}>Delete</DeleteButton>
@@ -259,7 +265,7 @@ const VideoTable = () => {
                 <VideoThumbnail onClick={() => {
                   handleRedirectVideo(item.playback_id, item.isPrivate, item.description);
                 }} src={getThumbUrl(item.playback_id, item.isPrivate, sharedVideos)} alt="" />
-                <h2>{item.title}</h2>
+                <VideoTitle>{item.title}</VideoTitle>
                 {(item as any).sharedBy && (
                   <p style={{ color: '#aaa', fontSize: '0.875rem', margin: '0.5rem 0' }}>
                     Shared by: {(item as any).sharedBy.name || (item as any).sharedBy.channel_name}
