@@ -69,3 +69,18 @@ type EncodingTier = 'baseline' | 'enhanced' | 'professional';
 type PlaybackPolicy = 'public' | 'signed';
 type ProgressState = 'waiting' | 'preparing' | 'ready' | 'completed' | 'errored';
 type TrackStatus = 'preparing' | 'ready' | 'errored';
+
+export type Comment = {
+    id: string;
+    video_id: string;
+    user_id: string;
+    content: string;
+    created_at: string;
+    updated_at: string;
+    user: {
+        id: string;
+        name: string;
+        channel_name: string;
+        email: string;
+    };
+};

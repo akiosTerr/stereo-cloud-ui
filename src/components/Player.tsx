@@ -1,7 +1,10 @@
 import MuxPlayer from "@mux/mux-player-react"
 import withAuth from "../hoc/PrivateRoute";
 import { useLocation, useParams } from "react-router-dom";
+import { useState, useEffect } from "react";
 import styled from "styled-components";
+import { fetchVideoInfo } from "../api/fetchVideos";
+import CommentsSection from "./CommentsSection";
 
 type Props = {}
 
@@ -26,11 +29,55 @@ const Description = styled.p`
     margin-top: 1rem;
 `
 
+const LoadingMessage = styled.div`
+    width: 95%;
+    margin: 1rem auto;
+    color: #fff;
+    text-align: center;
+    padding: 2rem;
+`
+
+const ErrorMessage = styled.div`
+    width: 95%;
+    margin: 1rem auto;
+    color: #dc3545;
+    text-align: center;
+    padding: 2rem;
+    background-color: #1a1a1b;
+    border-radius: 0.6rem;
+`
+
 function Player({ }: Props) {
     const location = useLocation();
     const { playbackId } = useParams();
     const videoToken = location.state?.token;
     const description = location.state?.description;
+    const [videoId, setVideoId] = useState<string | null>(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+
+    useEffect(() => {
+        if (playbackId) {
+            loadVideoInfo();
+        }
+    }, [playbackId]);
+
+    const loadVideoInfo = async () => {
+        setLoading(true);
+        setError(null);
+        try {
+            const videoInfo = await fetchVideoInfo(playbackId!);
+            if (videoInfo && typeof videoInfo === 'object' && 'id' in videoInfo) {
+                setVideoId(videoInfo.id as string);
+            } else {
+                setError('Failed to load video information');
+            }
+        } catch (err: any) {
+            setError(err.message || 'Failed to load video information');
+        } finally {
+            setLoading(false);
+        }
+    };
 
     const getToken = () => {
         return {
@@ -55,6 +102,13 @@ function Player({ }: Props) {
                 }}
             />
             <Description>{description}</Description>
+            {loading ? (
+                <LoadingMessage>Loading comments...</LoadingMessage>
+            ) : error ? (
+                <ErrorMessage>{error}</ErrorMessage>
+            ) : videoId ? (
+                <CommentsSection videoId={videoId} />
+            ) : null}
         </Wrapper>
     )
 }
