@@ -15,6 +15,9 @@ const CommentsContainer = styled.div`
     background-color: #121213;
     padding: 1.5rem;
     border-radius: 0.6rem;
+    @media (max-width: 425px) {
+        width: 88vw;
+    }
 `
 
 const Title = styled.h3`

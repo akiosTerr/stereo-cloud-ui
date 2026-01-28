@@ -3,6 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import styled from "styled-components";
 import { fetchVideosByChannelName, FormatedVideoAsset } from "../api/fetchVideos";
 import { GridVideo, VideoBlock, VideoChannelName, VideoContent, VideoDuration, VideoThumbnail, VideoTitle } from "../style";
+import withAuth from "../hoc/PrivateRoute";
 
 const ProfileImage = styled.img`
     width: 120px;
@@ -25,7 +26,6 @@ function ProfilePage() {
     const [videos, setVideos] = useState<FormatedVideoAsset[]>([]);
     const { channel_name } = useParams();
     const navigate = useNavigate();
-    console.log(channel_name);
 
     const handleRedirectVideo = (playbackId: string, description: string = '') => {
         navigate(`/player/${playbackId}`, { state: { description } });
@@ -82,4 +82,4 @@ function ProfilePage() {
     );
 }
 
-export default ProfilePage;
+export default withAuth(ProfilePage);

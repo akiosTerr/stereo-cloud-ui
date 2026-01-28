@@ -18,7 +18,7 @@ function App() {
         {loggedIn && <Navbar />}
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/dashboard" element={<VideoTable />} />
+          <Route path="/controlpanel" element={<VideoTable />} />
           <Route path="/profile/:channel_name" element={<ProfilePage />} />
           <Route path="/player/:playbackId" element={<Player />} />
           <Route path="/upload/" element={<Uploader />} />
