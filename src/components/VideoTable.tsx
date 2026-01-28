@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
 import withAuth from "../hoc/PrivateRoute";
-import { fetchVideoToken, FormatedVideoAsset, getMuxAssets, getMuxPrivateAssets } from "../api/fetchVideos";
+import { fetchVideoToken, FormatedVideoAsset, getMuxAssets, getMuxPrivateAssets, getMuxSharedAssets } from "../api/fetchVideos";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { deleteMuxVideo } from "../api/deleteVideo";
 import Cookies from "js-cookie";
+import ShareModal from "./ShareModal";
 
 
 const Title = styled.h2`
@@ -12,6 +13,11 @@ const Title = styled.h2`
 `
 const Title2 = styled.h2`
   color: #9521f3;
+`
+
+const Title3 = styled.h2`
+  color: #00bfff;
+  margin-top: 2rem;
 `
 const ChannelName = styled.h2`
   color: #fff;
@@ -102,19 +108,25 @@ const VideoTable = () => {
   const navigate = useNavigate();
   const [videos, setVideos] = useState<FormatedVideoAsset[]>([])
   const [privateVideos, setPrivateVideos] = useState<VideoAssetWithTokens[]>([])
+  const [sharedVideos, setSharedVideos] = useState<VideoAssetWithTokens[]>([])
+  const [shareModalOpen, setShareModalOpen] = useState(false)
+  const [selectedVideoId, setSelectedVideoId] = useState<string | null>(null)
 
-  const getThumbUrl = (id: string, isPrivate: boolean = false) => {
+  const getThumbUrl = (id: string, isPrivate: boolean = false, videoList: VideoAssetWithTokens[] = []) => {
     if (!isPrivate) {
       return `https://image.mux.com/${id}/thumbnail.png?width=445&height=250&time=2`
     } else {
-      const token = isPrivate ? privateVideos.find(v => v.playback_id === id)?.tokenThumbnail : null
+      const token = videoList.find(v => v.playback_id === id)?.tokenThumbnail || 
+                    privateVideos.find(v => v.playback_id === id)?.tokenThumbnail || 
+                    sharedVideos.find(v => v.playback_id === id)?.tokenThumbnail || null
       return `https://image.mux.com/${id}/thumbnail.png?width=445&height=250&time=2&token=${token}`
     }
   }
 
   const handleRedirectVideo = (playbackId: string, isPrivate: boolean = false, description: string = '') => {
     if (isPrivate) {
-      const token = privateVideos.find(v => v.playback_id === playbackId)?.tokenVideo
+      const token = privateVideos.find(v => v.playback_id === playbackId)?.tokenVideo ||
+                    sharedVideos.find(v => v.playback_id === playbackId)?.tokenVideo
       navigate(`/player/${playbackId}`, { state: { token, description } });
     } else {
       navigate(`/player/${playbackId}`, { state: { description } });
@@ -153,9 +165,37 @@ const VideoTable = () => {
     setPrivateVideos(signedVideos);
   }
 
+  const updateSharedVideos = async () => {
+    try {
+      const data = await getMuxSharedAssets();
+      // Filter to only include private videos that need tokens
+      const privateSharedVideos = data.filter((video: FormatedVideoAsset) => video.isPrivate);
+      const signedVideos = await signTokens(privateSharedVideos);
+      setSharedVideos(signedVideos);
+    } catch (error) {
+      console.error("Failed to fetch shared videos:", error);
+      setSharedVideos([]);
+    }
+  }
+
+  const handleShareClick = (videoId: string) => {
+    setSelectedVideoId(videoId);
+    setShareModalOpen(true);
+  }
+
+  const handleShareModalClose = () => {
+    setShareModalOpen(false);
+    setSelectedVideoId(null);
+  }
+
+  const handleShareUpdate = () => {
+    updateSharedVideos();
+  }
+
   useEffect(() => {
     updateVideos()
     updatePrivateVideos()
+    updateSharedVideos()
   }, [])
 
   const handleDelete = async (id: string, asset_id: string) => {
@@ -163,6 +203,7 @@ const VideoTable = () => {
       await deleteMuxVideo(id, asset_id)
       updateVideos()
       updatePrivateVideos()
+      updateSharedVideos()
     } else {
       console.log("canceled");
     }
@@ -183,7 +224,7 @@ const VideoTable = () => {
             </div>
             <ButtonRow>
               <DeleteButton onClick={() => handleDelete(item.id, item.asset_id)}>Delete</DeleteButton>
-              <ShareButton>Share</ShareButton>
+              <ShareButton onClick={() => handleShareClick(item.id)}>Share</ShareButton>
             </ButtonRow>
           </VideoBlock>
         ))}
@@ -200,12 +241,44 @@ const VideoTable = () => {
             </div>
             <ButtonRow>
               <DeleteButton onClick={() => handleDelete(item.id, item.asset_id)}>Delete</DeleteButton>
-              <ShareButton>Share</ShareButton>
+              <ShareButton onClick={() => handleShareClick(item.id)}>Share</ShareButton>
             </ButtonRow>
           </VideoBlock>
         ))}
       </GridVideo>
+      <Title3>Shared with Me</Title3>
+      <GridVideo>
+        {sharedVideos.length === 0 ? (
+          <div style={{ color: '#aaa', padding: '2rem', textAlign: 'center' }}>
+            No videos shared with you yet
+          </div>
+        ) : (
+          sharedVideos.map((item) => (
+            <VideoBlock key={item.id}>
+              <div>
+                <VideoThumbnail onClick={() => {
+                  handleRedirectVideo(item.playback_id, item.isPrivate, item.description);
+                }} src={getThumbUrl(item.playback_id, item.isPrivate, sharedVideos)} alt="" />
+                <h2>{item.title}</h2>
+                {(item as any).sharedBy && (
+                  <p style={{ color: '#aaa', fontSize: '0.875rem', margin: '0.5rem 0' }}>
+                    Shared by: {(item as any).sharedBy.name || (item as any).sharedBy.channel_name}
+                  </p>
+                )}
+              </div>
+            </VideoBlock>
+          ))
+        )}
+      </GridVideo>
 
+      {selectedVideoId && (
+        <ShareModal
+          videoId={selectedVideoId}
+          isOpen={shareModalOpen}
+          onClose={handleShareModalClose}
+          onShareUpdate={handleShareUpdate}
+        />
+      )}
     </>
   )
 }

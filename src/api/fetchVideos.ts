@@ -170,3 +170,27 @@ export const fetchVideosByChannelName = async (channel_name?: string): Promise<F
     const data = await response.json();
     return data;
 }
+
+export const getMuxSharedAssets = async (): Promise<FormatedVideoAsset[]> => {
+    let token = Cookies.get('jwtToken');
+    
+    if (!token) {
+        token = "";
+    }
+
+    const response = await fetch(`${apiUrl}/mux/shared`,
+        {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            }
+        });
+
+    if (response.status === 401) {
+        throw new Error('Unauthorized');
+    }
+
+    const data = await response.json();
+    return data;
+};

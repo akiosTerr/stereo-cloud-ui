@@ -141,7 +141,11 @@ function Uploader({onSuccess}: UploaderProps) {
                 onBlur={validateFields}
             />
             {validated && 
-                <MuxUploader endpoint={endpointUrl} onSuccess={onSuccessUplodHandler} />
+                <MuxUploader 
+                    maxFileSize={10000000000} 
+                    endpoint={endpointUrl} 
+                    onSuccess={onSuccessUplodHandler}
+                />
             }
         </WrapUploader>
     );
