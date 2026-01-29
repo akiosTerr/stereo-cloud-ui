@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import styled from "styled-components";
 import { searchUsers, shareVideoWithUser, unshareVideoWithUser, getUsersVideoIsSharedWith, User, SharedWithUser } from "../api/shareVideo";
 

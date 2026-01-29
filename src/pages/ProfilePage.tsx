@@ -2,17 +2,9 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import styled from "styled-components";
 import { fetchVideosByChannelName, FormatedVideoAsset } from "../api/fetchVideos";
-import { GridVideo, VideoBlock, VideoChannelName, VideoContent, VideoDuration, VideoThumbnail, VideoTitle } from "../style";
+import { GridVideo, VideoBlock, VideoContent, VideoDuration, VideoThumbnail, VideoTitle } from "../style";
 import withAuth from "../hoc/PrivateRoute";
 
-const ProfileImage = styled.img`
-    width: 120px;
-    height: 120px;
-    border-radius: 50%;
-    object-fit: cover;
-    display: block;
-    margin: 24px auto;
-`
 const WrapProfilePage = styled.div`
     display: flex;
     flex-direction: column;
@@ -22,7 +14,6 @@ const WrapProfilePage = styled.div`
 `
 
 function ProfilePage() {
-    const [profileImage, setProfileImage] = useState<string>("");
     const [videos, setVideos] = useState<FormatedVideoAsset[]>([]);
     const { channel_name } = useParams();
     const navigate = useNavigate();
@@ -35,15 +26,6 @@ function ProfilePage() {
         return `https://image.mux.com/${id}/thumbnail.png?width=445&height=250&time=2`
     }
 
-
-    // useEffect(() => {
-    //     const fetchProfileImage = async () => {
-    //         const response = await fetch("/api/profile/image");
-    //         const data = await response.json();
-    //         setProfileImage(data.image);
-    //     }
-    //     fetchProfileImage();
-    // }, []);
     useEffect(() => {
         const fetchVideos = async () => {
             const data = await fetchVideosByChannelName(channel_name);
