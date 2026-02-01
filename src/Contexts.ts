@@ -7,8 +7,8 @@ import { createContext, useContext } from "react"
 
 interface AuthContextType {
     isLoggedIn: Boolean
-    login: Function
-    logout: Function
+    login: (token: string, channel_name: string) => void
+    logout: () => void
 }
 
 export const SetAuthCtx = createContext<AuthContextType | undefined>(undefined);

@@ -8,6 +8,7 @@ import Uploader from './components/Uploader'
 import Navbar from './components/Navbar'
 import Home from './components/Home'
 import ProfilePage from './pages/ProfilePage'
+import ConfirmEmailPage from './pages/ConfirmEmailPage'
 
 function App() {
   const { loggedIn, login, logout } = useAuth();
@@ -18,6 +19,7 @@ function App() {
         {loggedIn && <Navbar />}
         <Routes>
           <Route path="/" element={<Home />} />
+          <Route path="/confirm-email" element={<ConfirmEmailPage />} />
           <Route path="/controlpanel" element={<VideoTable />} />
           <Route path="/profile/:channel_name" element={<ProfilePage />} />
           <Route path="/player/:playbackId" element={<Player />} />
