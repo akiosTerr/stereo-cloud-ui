@@ -34,9 +34,6 @@ export type VideoAsset = {
 
 const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
-console.log("apiUrl: ", import.meta.env.VITE_API_URL);
-
-
 export const getMuxAssets = async (): Promise<FormatedVideoAsset[]> => {
     let token = Cookies.get('jwtToken');
     

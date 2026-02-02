@@ -64,7 +64,7 @@ export const VideoThumbnail = styled.img`
     width: 445px;
   }
   @media (max-width: 480px) {
-    width: 400px;
+    width: 350px;
   }
 `
 

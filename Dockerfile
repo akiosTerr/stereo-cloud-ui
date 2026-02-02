@@ -12,9 +12,11 @@ RUN yarn install --frozen-lockfile
 # Copy source code
 COPY . .
 
-# Build argument for VITE_API_URL
+# Vite inlines VITE_* at build time – pass as build args
 ARG VITE_API_URL
+ARG VITE_TURNSTILE_PUB_KEY
 ENV VITE_API_URL=$VITE_API_URL
+ENV VITE_TURNSTILE_PUB_KEY=$VITE_TURNSTILE_PUB_KEY
 
 # Build the application
 RUN yarn build

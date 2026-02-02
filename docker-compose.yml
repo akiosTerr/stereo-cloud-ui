@@ -5,8 +5,10 @@ services:
       dockerfile: Dockerfile
       args:
         VITE_API_URL: ${VITE_API_URL}
+        VITE_TURNSTILE_PUB_KEY: ${VITE_TURNSTILE_PUB_KEY}
     container_name: cloud-midia-ui
-    # No direct port exposure; traffic goes through Caddy for HTTPS
+    env_file:
+      - .env
     restart: unless-stopped
 
   caddy:
