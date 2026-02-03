@@ -15,10 +15,8 @@ const Title = styled.h2`
 const Title2 = styled.h2`
   color: #9521f3;
 `
-
 const Title3 = styled.h2`
   color: #00bfff;
-  margin-top: 2rem;
 `
 const VideoTitle = styled.p`
   color: #fff;
@@ -59,6 +57,14 @@ const ButtonRow = styled.div`
   padding: 10px;
   border-radius: 0.6rem;
   border: 1px solid transparent;
+`
+
+const EmptyMessage = styled.p`
+  color:rgba(255, 255, 255, 0.55);
+  padding: 2rem;
+  text-align: center;
+  grid-column: span 5;
+  margin: 0;
 `
 
 const DeleteButton = styled.button`
@@ -302,9 +308,9 @@ const VideoTable = () => {
       <Title3>Shared with Me</Title3>
       <GridVideo>
         {sharedVideos.length === 0 ? (
-          <div style={{ color: '#aaa', padding: '2rem', textAlign: 'center' }}>
+          <EmptyMessage>
             No videos shared with you yet
-          </div>
+          </EmptyMessage>
         ) : (
           sharedVideos.map((item) => (
             <VideoBlock key={item.id}>
