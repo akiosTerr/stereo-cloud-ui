@@ -6,6 +6,7 @@ import styled from "styled-components";
 import { deleteMuxVideo } from "../api/deleteVideo";
 import Cookies from "js-cookie";
 import ShareModal from "./ShareModal";
+import DeleteModal, { type DeleteModalVideo } from "./DeleteModal";
 
 
 const Title = styled.h2`
@@ -78,6 +79,30 @@ const ShareButton = styled.button`
   }
 `
 
+const GetURLButton = styled.button`
+  color: #048cda;
+  background-color: transparent;
+  border: 1px solid transparent;
+  &:hover {
+    border: 1px solid #048cda;
+  }
+`
+
+const CopyLabel = styled.span`
+  display: inline-block;
+  animation: fadeScale 0.35s ease-out;
+  @keyframes fadeScale {
+    0% {
+      opacity: 0;
+      transform: scale(0.85);
+    }
+    100% {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+`
+
 const VideoThumbnail = styled.img`
   cursor: pointer;
   width: 100%;
@@ -86,7 +111,7 @@ const VideoThumbnail = styled.img`
     width: 445px;
   }
   @media (max-width: 480px) {
-    width: 400px;
+    width: 350px;
   }
 `
 
@@ -117,14 +142,16 @@ const VideoTable = () => {
   const [sharedVideos, setSharedVideos] = useState<VideoAssetWithTokens[]>([])
   const [shareModalOpen, setShareModalOpen] = useState(false)
   const [selectedVideoId, setSelectedVideoId] = useState<string | null>(null)
+  const [copiedPlaybackId, setCopiedPlaybackId] = useState<string | null>(null)
+  const [videoToDelete, setVideoToDelete] = useState<DeleteModalVideo | null>(null)
 
   const getThumbUrl = (id: string, isPrivate: boolean = false, videoList: VideoAssetWithTokens[] = []) => {
     if (!isPrivate) {
       return `https://image.mux.com/${id}/thumbnail.png?width=445&height=250&time=2`
     } else {
-      const token = videoList.find(v => v.playback_id === id)?.tokenThumbnail || 
-                    privateVideos.find(v => v.playback_id === id)?.tokenThumbnail || 
-                    sharedVideos.find(v => v.playback_id === id)?.tokenThumbnail || null
+      const token = videoList.find(v => v.playback_id === id)?.tokenThumbnail ||
+        privateVideos.find(v => v.playback_id === id)?.tokenThumbnail ||
+        sharedVideos.find(v => v.playback_id === id)?.tokenThumbnail || null
       return `https://image.mux.com/${id}/thumbnail.png?width=445&height=250&time=2&token=${token}`
     }
   }
@@ -132,7 +159,7 @@ const VideoTable = () => {
   const handleRedirectVideo = (playbackId: string, isPrivate: boolean = false, description: string = '') => {
     if (isPrivate) {
       const token = privateVideos.find(v => v.playback_id === playbackId)?.tokenVideo ||
-                    sharedVideos.find(v => v.playback_id === playbackId)?.tokenVideo
+        sharedVideos.find(v => v.playback_id === playbackId)?.tokenVideo
       navigate(`/player/${playbackId}`, { state: { token, description } });
     } else {
       navigate(`/player/${playbackId}`, { state: { description } });
@@ -189,6 +216,18 @@ const VideoTable = () => {
     setShareModalOpen(true);
   }
 
+  const sharePublicVideo = async (playbackId: string) => {
+    try {
+      const url = `${window.location.origin}/player/${playbackId}`;
+      await navigator.clipboard.writeText(url);
+      setCopiedPlaybackId(playbackId);
+      setTimeout(() => setCopiedPlaybackId(null), 1500);
+    } catch (error) {
+      console.error('Failed to copy URL: ', error);
+      alert('Failed to copy video URL.');
+    }
+  }
+
   const handleShareModalClose = () => {
     setShareModalOpen(false);
     setSelectedVideoId(null);
@@ -204,15 +243,19 @@ const VideoTable = () => {
     updateSharedVideos()
   }, [])
 
-  const handleDelete = async (id: string, asset_id: string) => {
-    if (confirm("delete this?")) {
-      await deleteMuxVideo(id, asset_id)
-      updateVideos()
-      updatePrivateVideos()
-      updateSharedVideos()
-    } else {
-      console.log("canceled");
-    }
+  const handleDeleteClick = (video: { id: string; asset_id: string; title: string }) => {
+    setVideoToDelete(video);
+  }
+
+  const handleDeleteConfirm = async (id: string, asset_id: string) => {
+    await deleteMuxVideo(id, asset_id);
+    updateVideos();
+    updatePrivateVideos();
+    updateSharedVideos();
+  }
+
+  const handleDeleteModalClose = () => {
+    setVideoToDelete(null);
   }
 
   return (
@@ -229,8 +272,12 @@ const VideoTable = () => {
               <VideoTitle>{item.title}</VideoTitle>
             </div>
             <ButtonRow>
-              <DeleteButton onClick={() => handleDelete(item.id, item.asset_id)}>Delete</DeleteButton>
-              <ShareButton onClick={() => handleShareClick(item.id)}>Share</ShareButton>
+              <DeleteButton onClick={() => handleDeleteClick({ id: item.id, asset_id: item.asset_id, title: item.title })}>Delete</DeleteButton>
+              <GetURLButton onClick={() => sharePublicVideo(item.playback_id)}>
+                <CopyLabel key={copiedPlaybackId === item.playback_id ? "copied" : "url"}>
+                  {copiedPlaybackId === item.playback_id ? "Copied" : "Get URL"}
+                </CopyLabel>
+              </GetURLButton>
             </ButtonRow>
           </VideoBlock>
         ))}
@@ -246,7 +293,7 @@ const VideoTable = () => {
               <VideoTitle>{item.title}</VideoTitle>
             </div>
             <ButtonRow>
-              <DeleteButton onClick={() => handleDelete(item.id, item.asset_id)}>Delete</DeleteButton>
+              <DeleteButton onClick={() => handleDeleteClick({ id: item.id, asset_id: item.asset_id, title: item.title })}>Delete</DeleteButton>
               <ShareButton onClick={() => handleShareClick(item.id)}>Share</ShareButton>
             </ButtonRow>
           </VideoBlock>
@@ -285,6 +332,13 @@ const VideoTable = () => {
           onShareUpdate={handleShareUpdate}
         />
       )}
+
+      <DeleteModal
+        isOpen={!!videoToDelete}
+        video={videoToDelete}
+        onClose={handleDeleteModalClose}
+        onConfirm={handleDeleteConfirm}
+      />
     </>
   )
 }
