@@ -24,3 +24,19 @@ export const deleteMuxVideo = async (id: string, asset_id: string) => {
   const data = await response.json();
   return data;
 };
+
+export const deleteLiveStream = async (id: string) => {
+  const token = Cookies.get('jwtToken') ?? '';
+  const response = await fetch(`${apiUrl}/mux/live-streams/${id}`, {
+    method: 'DELETE',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  if (!response.ok) {
+    const error = await response.text();
+    throw new Error(`Delete live stream failed: ${error}`);
+  }
+  return response.json();
+};

@@ -72,7 +72,7 @@ const UserMenuButton = styled.button`
     }
 `
 
-const DropdownMenu = styled.div<{ isOpen: boolean }>`
+const DropdownMenu = styled.div<{ isopen: boolean }>`
     position: absolute;
     top: 100%;
     right: 0;
@@ -81,9 +81,9 @@ const DropdownMenu = styled.div<{ isOpen: boolean }>`
     border-radius: 8px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
     min-width: 180px;
-    opacity: ${props => props.isOpen ? 1 : 0};
-    visibility: ${props => props.isOpen ? 'visible' : 'hidden'};
-    transform: ${props => props.isOpen ? 'translateY(0)' : 'translateY(-10px)'};
+    opacity: ${props => props.isopen ? 1 : 0};
+    visibility: ${props => props.isopen ? 'visible' : 'hidden'};
+    transform: ${props => props.isopen ? 'translateY(0)' : 'translateY(-10px)'};
     transition: opacity 0.2s, visibility 0.2s, transform 0.2s;
     z-index: 1000;
 `
@@ -134,7 +134,7 @@ const MobileMenuButton = styled.button`
     }
 `
 
-const Overlay = styled.div<{ isOpen: boolean }>`
+const Overlay = styled.div<{ isopen: boolean }>`
     display: none;
     position: fixed;
     top: 0;
@@ -143,8 +143,8 @@ const Overlay = styled.div<{ isOpen: boolean }>`
     bottom: 0;
     background-color: rgba(0, 0, 0, 0.5);
     z-index: 999;
-    opacity: ${props => props.isOpen ? 1 : 0};
-    visibility: ${props => props.isOpen ? 'visible' : 'hidden'};
+    opacity: ${props => props.isopen ? 1 : 0};
+    visibility: ${props => props.isopen ? 'visible' : 'hidden'};
     transition: opacity 0.3s, visibility 0.3s;
     
     @media (max-width: 768px) {
@@ -152,7 +152,7 @@ const Overlay = styled.div<{ isOpen: boolean }>`
     }
 `
 
-const SidePanel = styled.div<{ isOpen: boolean }>`
+const SidePanel = styled.div<{ isopen: boolean }>`
     display: none;
     position: fixed;
     top: 0;
@@ -161,7 +161,7 @@ const SidePanel = styled.div<{ isOpen: boolean }>`
     height: 100vh;
     background-color: #1a1a1a;
     z-index: 1000;
-    transform: ${props => props.isOpen ? 'translateX(0)' : 'translateX(100%)'};
+    transform: ${props => props.isopen ? 'translateX(0)' : 'translateX(100%)'};
     transition: transform 0.3s ease-in-out;
     box-shadow: -2px 0 8px rgba(0, 0, 0, 0.3);
     overflow-y: auto;
@@ -335,7 +335,7 @@ function Navbar({ }: Props) {
                     <UserMenuButton onClick={() => setIsDropdownOpen(!isDropdownOpen)}>
                         <FiChevronDown size={20} />
                     </UserMenuButton>
-                    <DropdownMenu isOpen={isDropdownOpen}>
+                    <DropdownMenu isopen={isDropdownOpen}>
                         <DropdownItem title="Logout" onClick={handleLogout}>
                             <FiLogOut size={18} />
                             Logout
@@ -343,8 +343,8 @@ function Navbar({ }: Props) {
                     </DropdownMenu>
                 </UserMenuContainer>
             </WrapNavbar>
-            <Overlay isOpen={isSidePanelOpen} onClick={handleSidePanelClose} />
-            <SidePanel ref={sidePanelRef} isOpen={isSidePanelOpen}>
+            <Overlay isopen={isSidePanelOpen} onClick={handleSidePanelClose} />
+            <SidePanel ref={sidePanelRef} isopen={isSidePanelOpen}>
                 <SidePanelHeader>
                     <SidePanelTitle>Menu</SidePanelTitle>
                     <SidePanelCloseButton onClick={handleSidePanelClose}>

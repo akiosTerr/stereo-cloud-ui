@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react";
 import withAuth from "../hoc/PrivateRoute";
-import { fetchVideoToken, FormatedVideoAsset, getMuxAssets, getMuxPrivateAssets, getMuxSharedAssets } from "../api/fetchVideos";
+import { fetchVideoToken, FormatedVideoAsset, getLiveStreams, getMuxAssets, getMuxPrivateAssets, getMuxSharedAssets, LiveStreamAsset } from "../api/fetchVideos";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
-import { deleteMuxVideo } from "../api/deleteVideo";
+import { deleteMuxVideo, deleteLiveStream } from "../api/deleteVideo";
 import Cookies from "js-cookie";
 import ShareModal from "./ShareModal";
 import DeleteModal, { type DeleteModalVideo } from "./DeleteModal";
+import CreateLiveStreamModal from "./CreateLiveStreamModal";
 
 
 const Title = styled.h2`
@@ -18,15 +19,17 @@ const Title2 = styled.h2`
 const Title3 = styled.h2`
   color: #00bfff;
 `
+const TitleLive = styled.h2`
+  color: #da1204;
+`
 const VideoTitle = styled.p`
   color: #fff;
   font-size: 1.2rem;
   font-weight: 600;
   margin-bottom: 1rem;
 `
-const ChannelName = styled.h2`
+const ChannelName = styled.h1`
   color: #fff;
-  font-size: 1.5rem;
   font-weight: 600;
   margin-bottom: 1rem;
 `
@@ -94,6 +97,29 @@ const GetURLButton = styled.button`
   }
 `
 
+const StreamKeyButton = styled.button`
+  color: #da9004;
+  background-color: transparent;
+  border: 1px solid transparent;
+  &:hover {
+    border: 1px solid #da9004;
+  }
+`
+
+const CreateLivestreamButton = styled.button`
+  color: #da9004;
+  background-color: transparent;
+  border: 1px solid #da9004;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  margin-bottom: 1rem;
+  font-size: 0.9375rem;
+  cursor: pointer;
+  &:hover {
+    background-color: rgba(218, 144, 4, 0.15);
+  }
+`
+
 const CopyLabel = styled.span`
   display: inline-block;
   animation: fadeScale 0.35s ease-out;
@@ -144,12 +170,17 @@ type VideoAssetWithTokens = FormatedVideoAsset & {
 const VideoTable = () => {
   const navigate = useNavigate();
   const [videos, setVideos] = useState<FormatedVideoAsset[]>([])
+  
   const [privateVideos, setPrivateVideos] = useState<VideoAssetWithTokens[]>([])
   const [sharedVideos, setSharedVideos] = useState<VideoAssetWithTokens[]>([])
   const [shareModalOpen, setShareModalOpen] = useState(false)
   const [selectedVideoId, setSelectedVideoId] = useState<string | null>(null)
   const [copiedPlaybackId, setCopiedPlaybackId] = useState<string | null>(null)
   const [videoToDelete, setVideoToDelete] = useState<DeleteModalVideo | null>(null)
+  const [liveStreamToDelete, setLiveStreamToDelete] = useState<DeleteModalVideo | null>(null)
+  const [liveStreams, setLiveStreams] = useState<LiveStreamAsset[]>([])
+  const [copiedStreamKeyId, setCopiedStreamKeyId] = useState<string | null>(null)
+  const [createLiveStreamModalOpen, setCreateLiveStreamModalOpen] = useState(false)
 
   const getThumbUrl = (id: string, isPrivate: boolean = false, videoList: VideoAssetWithTokens[] = []) => {
     if (!isPrivate) {
@@ -217,6 +248,27 @@ const VideoTable = () => {
     }
   }
 
+  const updateLiveStreams = async () => {
+    try {
+      const data = await getLiveStreams();
+      setLiveStreams(data);
+    } catch (error) {
+      console.error("Failed to fetch live streams:", error);
+      setLiveStreams([]);
+    }
+  }
+
+  const handleGetStreamKey = async (streamKey: string, streamId: string) => {
+    try {
+      await navigator.clipboard.writeText(streamKey);
+      setCopiedStreamKeyId(streamId);
+      setTimeout(() => setCopiedStreamKeyId(null), 1500);
+    } catch (error) {
+      console.error("Failed to copy stream key:", error);
+      alert("Failed to copy stream key.");
+    }
+  }
+
   const handleShareClick = (videoId: string) => {
     setSelectedVideoId(videoId);
     setShareModalOpen(true);
@@ -247,6 +299,7 @@ const VideoTable = () => {
     updateVideos()
     updatePrivateVideos()
     updateSharedVideos()
+    updateLiveStreams()
   }, [])
 
   const handleDeleteClick = (video: { id: string; asset_id: string; title: string }) => {
@@ -262,6 +315,20 @@ const VideoTable = () => {
 
   const handleDeleteModalClose = () => {
     setVideoToDelete(null);
+  }
+
+  const handleDeleteLiveStreamClick = (stream: LiveStreamAsset) => {
+    setLiveStreamToDelete({
+      id: stream.live_stream_id,
+      asset_id: "",
+      title: stream.title ?? "Untitled stream",
+    });
+  }
+
+  const handleDeleteLiveStreamConfirm = async (live_stream_id: string) => {
+    await deleteLiveStream(live_stream_id);
+    setLiveStreamToDelete(null);
+    updateLiveStreams();
   }
 
   return (
@@ -329,6 +396,41 @@ const VideoTable = () => {
           ))
         )}
       </GridVideo>
+      <TitleLive>Live Videos</TitleLive>
+      <CreateLivestreamButton onClick={() => setCreateLiveStreamModalOpen(true)}>
+        Create Livestream
+      </CreateLivestreamButton>
+      <GridVideo>
+        {liveStreams.length === 0 ? (
+          <EmptyMessage>No live streams yet</EmptyMessage>
+        ) : (
+        liveStreams.map((stream) => (
+          <VideoBlock key={stream.id}>
+            <div>
+              <VideoThumbnail
+                onClick={() => handleRedirectVideo(stream.playback_id, stream.isPrivate)}
+                src={`https://image.mux.com/${stream.playback_id}/thumbnail.png?width=445&height=250`}
+                alt=""
+              />
+              <VideoTitle>{stream.title || "Untitled stream"}</VideoTitle>
+              <p style={{ color: "#aaa", fontSize: "0.875rem", margin: "0.5rem 0" }}>
+                Status: {stream.status}
+              </p>
+            </div>
+            <ButtonRow>
+              <DeleteButton onClick={() => handleDeleteLiveStreamClick(stream)}>Delete</DeleteButton>
+              <StreamKeyButton
+                onClick={() => handleGetStreamKey(stream.stream_key, stream.id)}
+              >
+                <CopyLabel key={copiedStreamKeyId === stream.id ? "copied" : "key"}>
+                  {copiedStreamKeyId === stream.id ? "Copied" : "Get stream key"}
+                </CopyLabel>
+              </StreamKeyButton>
+            </ButtonRow>
+          </VideoBlock>
+        ))
+        )}
+      </GridVideo>
 
       {selectedVideoId && (
         <ShareModal
@@ -344,6 +446,22 @@ const VideoTable = () => {
         video={videoToDelete}
         onClose={handleDeleteModalClose}
         onConfirm={handleDeleteConfirm}
+      />
+
+      <DeleteModal
+        isOpen={!!liveStreamToDelete}
+        video={liveStreamToDelete}
+        onClose={() => setLiveStreamToDelete(null)}
+        onConfirm={(id) => handleDeleteLiveStreamConfirm(id)}
+        titleLabel="Delete live stream"
+        confirmButtonLabel="Delete"
+        deletingLabel="Deleting…"
+      />
+
+      <CreateLiveStreamModal
+        isOpen={createLiveStreamModalOpen}
+        onClose={() => setCreateLiveStreamModalOpen(false)}
+        onSuccess={updateLiveStreams}
       />
     </>
   )

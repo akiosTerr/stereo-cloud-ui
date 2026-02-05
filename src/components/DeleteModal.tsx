@@ -109,9 +109,20 @@ type DeleteModalProps = {
   video: DeleteModalVideo | null;
   onClose: () => void;
   onConfirm: (id: string, asset_id: string) => Promise<void>;
+  titleLabel?: string;
+  confirmButtonLabel?: string;
+  deletingLabel?: string;
 };
 
-const DeleteModal = ({ isOpen, video, onClose, onConfirm }: DeleteModalProps) => {
+const DeleteModal = ({
+  isOpen,
+  video,
+  onClose,
+  onConfirm,
+  titleLabel = "Delete video",
+  confirmButtonLabel = "Delete",
+  deletingLabel = "Deleting…",
+}: DeleteModalProps) => {
   const [isDeleting, setIsDeleting] = useState(false);
 
   const handleConfirm = async () => {
@@ -137,21 +148,21 @@ const DeleteModal = ({ isOpen, video, onClose, onConfirm }: DeleteModalProps) =>
     <ModalOverlay onClick={handleOverlayClick}>
       <ModalContent onClick={(e) => e.stopPropagation()}>
         <ModalHeader>
-          <ModalTitle>Delete video</ModalTitle>
+          <ModalTitle>{titleLabel}</ModalTitle>
           <CloseButton type="button" onClick={onClose} disabled={isDeleting} aria-label="Close">
             ×
           </CloseButton>
         </ModalHeader>
         <Message>
           Are you sure you want to delete{" "}
-          <VideoTitleHighlight>{video?.title ?? "this video"}</VideoTitleHighlight>? This cannot be undone.
+          <VideoTitleHighlight>{video?.title ?? "this item"}</VideoTitleHighlight>? This cannot be undone.
         </Message>
         <ButtonRow>
           <CancelButton type="button" onClick={onClose} disabled={isDeleting}>
             Cancel
           </CancelButton>
           <ConfirmDeleteButton type="button" onClick={handleConfirm} disabled={isDeleting}>
-            {isDeleting ? "Deleting…" : "Delete"}
+            {isDeleting ? deletingLabel : confirmButtonLabel}
           </ConfirmDeleteButton>
         </ButtonRow>
       </ModalContent>

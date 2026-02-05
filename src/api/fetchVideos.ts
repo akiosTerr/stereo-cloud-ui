@@ -168,6 +168,65 @@ export const fetchVideosByChannelName = async (channel_name?: string): Promise<F
     return data;
 }
 
+export type LiveStreamAsset = {
+    id: string;
+    user_id: string;
+    live_stream_id: string;
+    title?: string;
+    isPrivate: boolean;
+    stream_key: string;
+    status: string;
+    playback_id: string;
+    created_at: string;
+    updated_at: string;
+};
+
+export const getLiveStreams = async (): Promise<LiveStreamAsset[]> => {
+    let token = Cookies.get('jwtToken');
+
+    if (!token) {
+        token = "";
+    }
+
+    const response = await fetch(`${apiUrl}/mux/live-streams`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+        },
+    });
+
+    if (response.status === 401) {
+        throw new Error('Unauthorized');
+    }
+
+    const data = await response.json();
+    return data;
+};
+
+export const createLiveStream = async (body: { title?: string; isPrivate?: boolean }): Promise<LiveStreamAsset> => {
+    const token = Cookies.get('jwtToken') ?? '';
+
+    const response = await fetch(`${apiUrl}/mux/live-stream`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify(body),
+    });
+
+    if (response.status === 401) {
+        throw new Error('Unauthorized');
+    }
+    if (!response.ok) {
+        const err = await response.json().catch(() => ({}));
+        throw new Error(err.message ?? 'Failed to create live stream');
+    }
+
+    return response.json();
+};
+
 export const getMuxSharedAssets = async (): Promise<FormatedVideoAsset[]> => {
     let token = Cookies.get('jwtToken');
     
