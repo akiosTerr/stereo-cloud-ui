@@ -55,7 +55,6 @@ export const signup = async (
     setIsLoading: (loading: boolean) => void,
 ): Promise<{ success: boolean; message?: string }> => {
     const { email, password, name, channel_name, turnstileToken } = payload;
-    console.log(turnstileToken);
     if (!email || !password || !name || !channel_name || !turnstileToken) {
         setError('All fields and verification are required.');
         return { success: false };

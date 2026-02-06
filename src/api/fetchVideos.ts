@@ -32,6 +32,20 @@ export type VideoAsset = {
     updated_at: string
   }
 
+export type LivestreamStatus = 'idle' | 'active' | 'completed';
+
+export type VideoInfo = {
+    id: string;
+    [key: string]: unknown;
+    isLivestream?: boolean;
+    livestreamStatus?: LivestreamStatus;
+};
+
+export type LivestreamStatusResponse = {
+    isLivestream: boolean;
+    livestreamStatus?: LivestreamStatus;
+};
+
 const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
 export const getMuxAssets = async (): Promise<FormatedVideoAsset[]> => {
@@ -123,8 +137,7 @@ export const fetchVideoToken = async (playback_id?: string) => {
     return data;
 }
 
-export const fetchVideoInfo = async (id?: string) => {
-     
+export const fetchPlayerInfo = async (id?: string) => {
     if(!id) {
         return new Error("no playback id found!")
     }
@@ -135,7 +148,7 @@ export const fetchVideoInfo = async (id?: string) => {
         token = "";
     }
 
-    const response = await fetch(`${apiUrl}/mux/${id}`,
+    const response = await fetch(`${apiUrl}/mux/player/${id}`,
         {
             method: 'GET',
             headers: {
@@ -147,6 +160,29 @@ export const fetchVideoInfo = async (id?: string) => {
     const data = await response.json();
     return data;
 }
+
+export const fetchLivestreamStatus = async (videoId: string): Promise<LivestreamStatusResponse> => {
+    const token = Cookies.get('jwtToken') ?? '';
+
+    const response = await fetch(`${apiUrl}/mux/video/${videoId}/livestream-status`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+        },
+    });
+
+    if (response.status === 401) {
+        throw new Error('Unauthorized');
+    }
+
+    if (!response.ok) {
+        const error = await response.text();
+        throw new Error(`Failed to fetch livestream status: ${error}`);
+    }
+
+    return response.json();
+};
 
 export const fetchVideosByChannelName = async (channel_name?: string): Promise<FormatedVideoAsset[]> => {
     if(!channel_name) {

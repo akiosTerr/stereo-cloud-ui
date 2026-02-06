@@ -159,14 +159,12 @@ function LoginPage({ login }: LoginFormType) {
 
   const handleSignupSubmit = async (e: React.FormEvent) => {
     e.preventDefault();    
-    console.log(turnstileSiteKey);
     setError('');
     setSuccessMessage('');
     if (!turnstileToken && turnstileSiteKey) {
       setError('Please complete the verification.');
       return;
     }
-    console.log(turnstileToken);
     const result = await signup(
       {
         email,

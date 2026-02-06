@@ -45,7 +45,6 @@ function Uploader({onSuccess}: UploaderProps) {
             setValidated(true)
             createMuxUpload(videoTitle, description, isPrivate)
             .then(res => {
-                console.log(res);
                 setEndpointUrl(res.data.url)
             })
             .catch(console.error);
@@ -53,8 +52,6 @@ function Uploader({onSuccess}: UploaderProps) {
     }
 
     const onSuccessUplodHandler = (e: any) => {
-        console.log('success');
-        console.log(e.target.type);
         onSuccess?.()
     }
 

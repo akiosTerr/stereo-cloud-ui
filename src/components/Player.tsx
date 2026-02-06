@@ -1,11 +1,11 @@
 import MuxPlayer from "@mux/mux-player-react"
 import withAuth from "../hoc/PrivateRoute";
 import { useLocation, useParams } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import styled from "styled-components";
-import { fetchVideoInfo } from "../api/fetchVideos";
+import { fetchPlayerInfo, fetchLivestreamStatus, type VideoInfo, type LivestreamStatus } from "../api/fetchVideos";
 import CommentsSection from "./CommentsSection";
-
+import LiveCommentsSection from "./LiveCommentsSection";
 type Props = {}
 
 const Wrapper = styled.div`
@@ -47,6 +47,8 @@ const ErrorMessage = styled.div`
     border-radius: 0.6rem;
 `
 
+const LIVESTREAM_STATUS_POLL_MS = 12_000;
+
 function Player({ }: Props) {
     const location = useLocation();
     const { playbackId } = useParams();
@@ -55,29 +57,64 @@ function Player({ }: Props) {
     const [videoId, setVideoId] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [showLiveComments, setShowLiveComments] = useState(false)
+    const statusPollRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
+ 
     useEffect(() => {
         if (playbackId) {
             loadVideoInfo();
         }
+        return () => {
+            if (statusPollRef.current) {
+                clearInterval(statusPollRef.current);
+                statusPollRef.current = null;
+            }
+        };
     }, [playbackId]);
 
     const loadVideoInfo = async () => {
         setLoading(true);
         setError(null);
         try {
-            const videoInfo = await fetchVideoInfo(playbackId!);
-            if (videoInfo && typeof videoInfo === 'object' && 'id' in videoInfo) {
-                setVideoId(videoInfo.id as string);
+            const videoInfo = await fetchPlayerInfo(playbackId!) as VideoInfo | Error;
+            if (videoInfo && typeof videoInfo === 'object' && !(videoInfo instanceof Error) && 'id' in videoInfo) {
+                setVideoId(videoInfo.id);
+                setShowLiveComments(!!videoInfo.isLivestream && videoInfo.livestreamStatus === 'active');
             } else {
                 setError('Failed to load video information');
             }
+            
         } catch (err: any) {
             setError(err.message || 'Failed to load video information');
         } finally {
             setLoading(false);
         }
     };
+
+    const pollLivestreamStatus = () => {
+        if (!videoId) return;
+        fetchLivestreamStatus(videoId)
+            .then((res) => {
+                if (res.livestreamStatus !== 'active' && statusPollRef.current) {
+                    clearInterval(statusPollRef.current);
+                    statusPollRef.current = null;
+                }
+            })
+            .catch(() => {});
+    };
+
+
+    useEffect(() => {
+        if (!showLiveComments || !videoId) return;
+        statusPollRef.current = setInterval(pollLivestreamStatus, LIVESTREAM_STATUS_POLL_MS);
+        return () => {
+            if (statusPollRef.current) {
+                clearInterval(statusPollRef.current);
+                statusPollRef.current = null;
+            }
+        };
+    }, [showLiveComments, videoId]);
 
     const getToken = () => {
         return {
@@ -107,7 +144,11 @@ function Player({ }: Props) {
             ) : error ? (
                 <ErrorMessage>{error}</ErrorMessage>
             ) : videoId ? (
-                <CommentsSection videoId={videoId} />
+                showLiveComments ? (
+                    <LiveCommentsSection videoId={videoId} />
+                ) : (
+                    <CommentsSection videoId={videoId} />
+                )
             ) : null}
         </Wrapper>
     )
