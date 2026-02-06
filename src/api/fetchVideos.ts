@@ -137,6 +137,29 @@ export const fetchVideoToken = async (playback_id?: string) => {
     return data;
 }
 
+export const updateVideo = async (
+    videoId: string,
+    body: { title?: string; description?: string }
+): Promise<FormatedVideoAsset> => {
+    const token = Cookies.get('jwtToken') ?? '';
+    const response = await fetch(`${apiUrl}/mux/video/${videoId}`, {
+        method: 'PATCH',
+        headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(body),
+    });
+    if (response.status === 401) {
+        throw new Error('Unauthorized');
+    }
+    if (!response.ok) {
+        const error = await response.text();
+        throw new Error(error || 'Failed to update video');
+    }
+    return response.json();
+};
+
 export const fetchPlayerInfo = async (id?: string) => {
     if(!id) {
         return new Error("no playback id found!")

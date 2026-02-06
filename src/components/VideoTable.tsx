@@ -8,6 +8,7 @@ import Cookies from "js-cookie";
 import ShareModal from "./ShareModal";
 import DeleteModal, { type DeleteModalVideo } from "./DeleteModal";
 import CreateLiveStreamModal from "./CreateLiveStreamModal";
+import EditVideoModal, { type EditVideoModalVideo } from "./EditVideoModal";
 
 
 const Title = styled.h2`
@@ -85,6 +86,15 @@ const ShareButton = styled.button`
   border: 1px solid transparent;
   &:hover {
     border: 1px solid #04da04;
+  }
+`
+
+const EditButton = styled.button`
+  color: #da9004;
+  background-color: transparent;
+  border: 1px solid transparent;
+  &:hover {
+    border: 1px solid #da9004;
   }
 `
 
@@ -183,6 +193,7 @@ const VideoTable = () => {
   const [liveStreams, setLiveStreams] = useState<LiveStreamAsset[]>([])
   const [copiedStreamKeyId, setCopiedStreamKeyId] = useState<string | null>(null)
   const [createLiveStreamModalOpen, setCreateLiveStreamModalOpen] = useState(false)
+  const [videoToEdit, setVideoToEdit] = useState<EditVideoModalVideo | null>(null)
 
   const getThumbUrl = (id: string, isPrivate: boolean = false, videoList: VideoAssetWithTokens[] = []) => {
     if (!isPrivate) {
@@ -297,6 +308,24 @@ const VideoTable = () => {
     updateSharedVideos();
   }
 
+  const handleEditClick = (video: { id: string; title: string; description: string }) => {
+    setVideoToEdit({
+      id: video.id,
+      title: video.title ?? "",
+      description: video.description ?? "",
+    });
+  }
+
+  const handleEditModalClose = () => {
+    setVideoToEdit(null);
+  }
+
+  const handleEditSuccess = () => {
+    updateVideos();
+    updatePrivateVideos();
+    updateSharedVideos();
+  }
+
   useEffect(() => {
     updateVideos()
     updatePrivateVideos()
@@ -348,6 +377,7 @@ const VideoTable = () => {
             </div>
             <ButtonRow>
               <DeleteButton onClick={() => handleDeleteClick({ id: item.id, asset_id: item.asset_id, title: item.title })}>Delete</DeleteButton>
+              <EditButton onClick={() => handleEditClick({ id: item.id, title: item.title, description: item.description })}>Edit</EditButton>
               <GetURLButton onClick={() => sharePublicVideo(item.playback_id)}>
                 <CopyLabel key={copiedPlaybackId === item.playback_id ? "copied" : "url"}>
                   {copiedPlaybackId === item.playback_id ? "Copied" : "Get URL"}
@@ -369,6 +399,7 @@ const VideoTable = () => {
             </div>
             <ButtonRow>
               <DeleteButton onClick={() => handleDeleteClick({ id: item.id, asset_id: item.asset_id, title: item.title })}>Delete</DeleteButton>
+              <EditButton onClick={() => handleEditClick({ id: item.id, title: item.title, description: item.description })}>Edit</EditButton>
               <ShareButton onClick={() => handleShareClick(item.id)}>Share</ShareButton>
             </ButtonRow>
           </VideoBlock>
@@ -469,6 +500,13 @@ const VideoTable = () => {
         isOpen={createLiveStreamModalOpen}
         onClose={() => setCreateLiveStreamModalOpen(false)}
         onSuccess={updateLiveStreams}
+      />
+
+      <EditVideoModal
+        isOpen={!!videoToEdit}
+        video={videoToEdit}
+        onClose={handleEditModalClose}
+        onSuccess={handleEditSuccess}
       />
     </>
   )
