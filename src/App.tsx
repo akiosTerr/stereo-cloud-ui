@@ -7,6 +7,7 @@ import Player from './components/Player'
 import Uploader from './components/Uploader'
 import Navbar from './components/Navbar'
 import Home from './components/Home'
+import LiveStreams from './components/LiveStreams'
 import ProfilePage from './pages/ProfilePage'
 import ConfirmEmailPage from './pages/ConfirmEmailPage'
 
@@ -23,6 +24,7 @@ function App() {
           <Route path="/controlpanel" element={<VideoTable />} />
           <Route path="/profile/:channel_name" element={<ProfilePage />} />
           <Route path="/player/:playbackId" element={<Player />} />
+          <Route path="/live-streams" element={<LiveStreams />} />
           <Route path="/upload/" element={<Uploader />} />
         </Routes>
       </SetAuthCtx.Provider>

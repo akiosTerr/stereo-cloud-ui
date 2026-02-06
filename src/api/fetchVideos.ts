@@ -181,6 +181,29 @@ export type LiveStreamAsset = {
     updated_at: string;
 };
 
+export type ActiveLiveStream = LiveStreamAsset & {
+    user?: { channel_name: string };
+};
+
+export const getActiveLiveStreams = async (): Promise<ActiveLiveStream[]> => {
+    const token = Cookies.get('jwtToken') ?? '';
+
+    const response = await fetch(`${apiUrl}/mux/live-streams/active`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+        },
+    });
+
+    if (response.status === 401) {
+        throw new Error('Unauthorized');
+    }
+
+    const data = await response.json();
+    return data;
+};
+
 export const getLiveStreams = async (): Promise<LiveStreamAsset[]> => {
     let token = Cookies.get('jwtToken');
 

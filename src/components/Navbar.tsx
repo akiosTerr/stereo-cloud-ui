@@ -1,11 +1,10 @@
-import { AiOutlineHome, AiOutlineUpload, AiOutlineUser } from "react-icons/ai";
+import { AiOutlineHome, AiOutlineUpload, AiOutlineUser, AiOutlinePlayCircle  } from "react-icons/ai";
 import { FiLogOut, FiChevronDown, FiMenu, FiX } from "react-icons/fi";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
 import Cookies from "js-cookie";
 import { useState, useRef, useEffect } from "react";
 import { useAuth } from "../hooks/auth_hook";
-
 type Props = {}
 
 const WrapNavbar = styled.nav`
@@ -325,6 +324,7 @@ function Navbar({ }: Props) {
                 </MobileMenuButton>
                 <MainLinks>
                     <LinkNavbar title="Home" to="/"><AiOutlineHome size={24} /></LinkNavbar>
+                    <LinkNavbar title="Live Streams" to="/live-streams"><AiOutlinePlayCircle size={24} /></LinkNavbar>
                     <LinkNavbar title="Upload" to="/upload"><AiOutlineUpload size={24} /></LinkNavbar>
                     <LinkNavbar title="Control Panel" to="/controlpanel"><AiOutlineUser size={24} /></LinkNavbar>
                 </MainLinks>
@@ -363,6 +363,10 @@ function Navbar({ }: Props) {
                     <SidePanelLink title="Control Panel" to="/controlpanel" onClick={handleSidePanelLinkClick}>
                         <AiOutlineUser size={24} />
                         Control Panel
+                    </SidePanelLink>
+                    <SidePanelLink title="Live Streams" to="/live-streams" onClick={handleSidePanelLinkClick}>
+                        <AiOutlinePlayCircle size={24} />
+                        Live Streams
                     </SidePanelLink>
                 </SidePanelContent>
                 <SidePanelUserSection>

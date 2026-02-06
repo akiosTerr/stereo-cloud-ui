@@ -106,7 +106,7 @@ const StreamKeyButton = styled.button`
   }
 `
 
-const CreateLivestreamButton = styled.button`
+const CreateLivestreamButton = styled.button<{ $disabled?: boolean }>`
   color: #da9004;
   background-color: transparent;
   border: 1px solid #da9004;
@@ -114,9 +114,10 @@ const CreateLivestreamButton = styled.button`
   border-radius: 0.5rem;
   margin-bottom: 1rem;
   font-size: 0.9375rem;
-  cursor: pointer;
+  cursor: ${(p) => (p.$disabled ? 'not-allowed' : 'pointer')};
+  opacity: ${(p) => (p.$disabled ? 0.5 : 1)};
   &:hover {
-    background-color: rgba(218, 144, 4, 0.15);
+    background-color: ${(p) => (p.$disabled ? 'transparent' : 'rgba(218, 144, 4, 0.15)')};
   }
 `
 
@@ -155,6 +156,7 @@ const VideoBlock = styled.div`
   border-radius: 0.6rem;
   border: 1px solid transparent;
   max-width: 420px;
+  min-width: 280px;
   margin: 0 auto;
   &:hover {
     border: 1px solid #fff;
@@ -397,7 +399,12 @@ const VideoTable = () => {
         )}
       </GridVideo>
       <TitleLive>Live Videos</TitleLive>
-      <CreateLivestreamButton onClick={() => setCreateLiveStreamModalOpen(true)}>
+      <CreateLivestreamButton
+        $disabled={liveStreams.length >= 3}
+        disabled={liveStreams.length >= 3}
+        onClick={() => liveStreams.length < 3 && setCreateLiveStreamModalOpen(true)}
+        title={liveStreams.length >= 3 ? 'Maximum of 3 livestreams reached. Delete one to create a new one.' : undefined}
+      >
         Create Livestream
       </CreateLivestreamButton>
       <GridVideo>
