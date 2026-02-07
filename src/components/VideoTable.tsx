@@ -28,6 +28,9 @@ const VideoTitle = styled.p`
   font-size: 1.2rem;
   font-weight: 600;
   margin-bottom: 1rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 `
 const ChannelName = styled.h1`
   color: #fff;

@@ -51,7 +51,7 @@ export const GridVideo = styled.div`
 `
 
 export const VideoDuration = styled.p`
-  color: #fff;
+  color: #9521f3;
   margin: 0;
 `
 
@@ -100,7 +100,11 @@ export const VideoContent = styled.div`
 `
 export const VideoTitle = styled.p`
   color: #fff;
+  font-weight: bold;
   margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 `
 
 export const ToggleContainer = styled.div`

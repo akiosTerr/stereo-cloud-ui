@@ -57,6 +57,21 @@ const SearchInput = styled(TextInput)`
     background-color: rgba(255, 255, 255, 0.15);
   }
 `
+
+const VideoDate = styled.p`
+  color: #fff;
+  font-size: 0.8rem;
+  margin: 0;
+`
+
+const VideoHeader = styled.div`
+  display: flex;
+  width: 100%;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+`
+
 const SearchIcon = styled(AiOutlineSearch)`
   position: absolute;
   right: 1rem;
@@ -124,13 +139,17 @@ const Home = () => {
     video.title.toLowerCase().includes(searchQuery.toLowerCase())
   )
 
+  const formatDate = (date: string) => {
+    return new Date(date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
+  }
+
   return (
     <>
       <SearchContainer>
         <SearchInput
           type="text"
           placeholder="Search videos by title..."
-          value={searchQuery}
+          value={searchQuery} 
           onChange={(e) => setSearchQuery(e.target.value)}
         />
         <SearchIcon />
@@ -142,14 +161,17 @@ const Home = () => {
               handleRedirectVideo(item.playback_id, item.description);
             }} src={getThumbUrl(item.playback_id)} alt="" />
             <VideoContent>
-              <VideoTitle>{item.title}</VideoTitle>
-              <VideoInfoContainer>
-                <VideoDuration>
-                  {typeof item.duration === 'number' ? formatDuration(item.duration) : '--:--'}
-                </VideoDuration>
+                <VideoHeader>
+                  <VideoTitle>{item.title}</VideoTitle>
+                  <VideoDuration>
+                      {typeof item.duration === 'number' ? formatDuration(item.duration) : '--:--'}
+                    </VideoDuration>
+                </VideoHeader>
+                <VideoInfoContainer>
                 <VideoChannelName onClick={() => {
                   navigate(`/profile/${item.channel_name}`);
                 }}>{item.channel_name}</VideoChannelName>
+                <VideoDate>{formatDate(item.created_at)}</VideoDate>
               </VideoInfoContainer>
             </VideoContent>
           </VideoBlock>
