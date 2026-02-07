@@ -48,14 +48,14 @@ export type LivestreamStatusResponse = {
 
 const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
-export const getMuxAssets = async (): Promise<FormatedVideoAsset[]> => {
+export const getMuxAssets = async (page: number = 1, limit: number = 10): Promise<FormatedVideoAsset[]> => {
     let token = Cookies.get('jwtToken');
     
     if (!token) {
         token = "";
     }
 
-    const response = await fetch(`${apiUrl}/mux/`,
+    const response = await fetch(`${apiUrl}/mux/?page=${page}&limit=${limit}`,
         {
             method: 'GET',
             headers: {
@@ -72,14 +72,14 @@ export const getMuxAssets = async (): Promise<FormatedVideoAsset[]> => {
     return data;
 };
 
-export const getMuxPrivateAssets = async (): Promise<FormatedVideoAsset[]> => {
+export const getMuxPrivateAssets = async (page: number = 1, limit: number = 10): Promise<FormatedVideoAsset[]> => {
     let token = Cookies.get('jwtToken');
     
     if (!token) {
         token = "";
     }
 
-    const response = await fetch(`${apiUrl}/mux/private`,
+    const response = await fetch(`${apiUrl}/mux/private?page=${page}&limit=${limit}`,
         {
             method: 'GET',
             headers: {
@@ -309,14 +309,14 @@ export const createLiveStream = async (body: { title?: string; isPrivate?: boole
     return response.json();
 };
 
-export const getMuxSharedAssets = async (): Promise<FormatedVideoAsset[]> => {
+export const getMuxSharedAssets = async (page: number = 1, limit: number = 10): Promise<FormatedVideoAsset[]> => {
     let token = Cookies.get('jwtToken');
     
     if (!token) {
         token = "";
     }
 
-    const response = await fetch(`${apiUrl}/mux/shared`,
+    const response = await fetch(`${apiUrl}/mux/shared?page=${page}&limit=${limit}`,
         {
             method: 'GET',
             headers: {

@@ -149,6 +149,28 @@ const CreateLivestreamButton = styled.button<{ $disabled?: boolean }>`
   }
 `
 
+const ButtonContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 20px;
+  margin-bottom: 20px;
+`
+
+const LoadMoreButton = styled.button`
+  background-color: transparent;
+  color: #fff;
+  border: 1px solid #fff;
+  padding: 10px 20px;
+  border-radius: 0.6rem;
+  cursor: pointer;
+`
+
+const Loading = styled.p`
+  color: #fff;
+  margin: 0;
+`
+
 const CopyLabel = styled.span`
   display: inline-block;
   animation: fadeScale 0.35s ease-out;
@@ -191,6 +213,8 @@ const VideoBlock = styled.div`
   }
 `
 
+const PAGE_SIZE = 10;
+
 type VideoAssetWithTokens = FormatedVideoAsset & {
   tokenVideo?: string;
   tokenThumbnail?: string;
@@ -200,9 +224,20 @@ type VideoAssetWithTokens = FormatedVideoAsset & {
 const VideoTable = () => {
   const navigate = useNavigate();
   const [videos, setVideos] = useState<FormatedVideoAsset[]>([])
-  
+  const [pagePublic, setPagePublic] = useState(1)
+  const [hasMorePublic, setHasMorePublic] = useState(true)
+  const [loadingPublic, setLoadingPublic] = useState(false)
+
   const [privateVideos, setPrivateVideos] = useState<VideoAssetWithTokens[]>([])
+  const [pagePrivate, setPagePrivate] = useState(1)
+  const [hasMorePrivate, setHasMorePrivate] = useState(true)
+  const [loadingPrivate, setLoadingPrivate] = useState(false)
+
   const [sharedVideos, setSharedVideos] = useState<VideoAssetWithTokens[]>([])
+  const [pageShared, setPageShared] = useState(1)
+  const [hasMoreShared, setHasMoreShared] = useState(true)
+  const [loadingShared, setLoadingShared] = useState(false)
+
   const [shareModalOpen, setShareModalOpen] = useState(false)
   const [selectedVideoId, setSelectedVideoId] = useState<string | null>(null)
   const [copiedPlaybackId, setCopiedPlaybackId] = useState<string | null>(null)
@@ -257,26 +292,93 @@ const VideoTable = () => {
   }
 
   const updateVideos = async () => {
-    const data = await getMuxAssets();
+    setLoadingPublic(true);
+    const data = await getMuxAssets(1, PAGE_SIZE);
     setVideos(data);
+    setPagePublic(1);
+    setHasMorePublic(data.length === PAGE_SIZE);
+    setLoadingPublic(false);
+  }
+
+  const loadMorePublic = async () => {
+    if (loadingPublic || !hasMorePublic) return;
+    setLoadingPublic(true);
+    const nextPage = pagePublic + 1;
+    const data = await getMuxAssets(nextPage, PAGE_SIZE);
+    if (data.length === 0) {
+      setHasMorePublic(false);
+    } else {
+      setVideos((prev) => [...prev, ...data]);
+      setPagePublic(nextPage);
+      setHasMorePublic(data.length === PAGE_SIZE);
+    }
+    setLoadingPublic(false);
   }
 
   const updatePrivateVideos = async () => {
-    const data = await getMuxPrivateAssets();
+    setLoadingPrivate(true);
+    const data = await getMuxPrivateAssets(1, PAGE_SIZE);
     const signedVideos = await signTokens(data);
     setPrivateVideos(signedVideos);
+    setPagePrivate(1);
+    setHasMorePrivate(data.length === PAGE_SIZE);
+    setLoadingPrivate(false);
+  }
+
+  const loadMorePrivate = async () => {
+    if (loadingPrivate || !hasMorePrivate) return;
+    setLoadingPrivate(true);
+    const nextPage = pagePrivate + 1;
+    const data = await getMuxPrivateAssets(nextPage, PAGE_SIZE);
+    const signedVideos = await signTokens(data);
+    if (signedVideos.length === 0) {
+      setHasMorePrivate(false);
+    } else {
+      setPrivateVideos((prev) => [...prev, ...signedVideos]);
+      setPagePrivate(nextPage);
+      setHasMorePrivate(signedVideos.length === PAGE_SIZE);
+    }
+    setLoadingPrivate(false);
   }
 
   const updateSharedVideos = async () => {
     try {
-      const data = await getMuxSharedAssets();
-      // Filter to only include private videos that need tokens
+      setLoadingShared(true);
+      const data = await getMuxSharedAssets(1, PAGE_SIZE);
       const privateSharedVideos = data.filter((video: FormatedVideoAsset) => video.isPrivate);
       const signedVideos = await signTokens(privateSharedVideos);
       setSharedVideos(signedVideos);
+      setPageShared(1);
+      setHasMoreShared(data.length === PAGE_SIZE);
     } catch (error) {
       console.error("Failed to fetch shared videos:", error);
       setSharedVideos([]);
+      setHasMoreShared(false);
+    } finally {
+      setLoadingShared(false);
+    }
+  }
+
+  const loadMoreShared = async () => {
+    if (loadingShared || !hasMoreShared) return;
+    try {
+      setLoadingShared(true);
+      const nextPage = pageShared + 1;
+      const data = await getMuxSharedAssets(nextPage, PAGE_SIZE);
+      const privateSharedVideos = data.filter((video: FormatedVideoAsset) => video.isPrivate);
+      const signedVideos = await signTokens(privateSharedVideos);
+      if (signedVideos.length === 0) {
+        setHasMoreShared(false);
+      } else {
+        setSharedVideos((prev) => [...prev, ...signedVideos]);
+        setPageShared(nextPage);
+        setHasMoreShared(data.length === PAGE_SIZE);
+      }
+    } catch (error) {
+      console.error("Failed to load more shared videos:", error);
+      setHasMoreShared(false);
+    } finally {
+      setLoadingShared(false);
     }
   }
 
@@ -424,6 +526,13 @@ const VideoTable = () => {
           </VideoBlock>
         ))}
       </GridVideo>
+      {hasMorePublic && (
+        <ButtonContainer>
+          <LoadMoreButton onClick={loadMorePublic}>
+            {loadingPublic ? <Loading>Loading...</Loading> : 'Show More Videos'}
+          </LoadMoreButton>
+        </ButtonContainer>
+      )}
       <Title2>Private Videos</Title2>
       <GridVideo>
         {privateVideos.map((item) => (
@@ -442,6 +551,13 @@ const VideoTable = () => {
           </VideoBlock>
         ))}
       </GridVideo>
+      {hasMorePrivate && (
+        <ButtonContainer>
+          <LoadMoreButton onClick={loadMorePrivate}>
+            {loadingPrivate ? <Loading>Loading...</Loading> : 'Show More Videos'}
+          </LoadMoreButton>
+        </ButtonContainer>
+      )}
       <Title3>Shared with Me</Title3>
       <GridVideo>
         {sharedVideos.length === 0 ? (
@@ -474,6 +590,13 @@ const VideoTable = () => {
           ))
         )}
       </GridVideo>
+      {hasMoreShared && (
+        <ButtonContainer>
+          <LoadMoreButton onClick={loadMoreShared}>
+            {loadingShared ? <Loading>Loading...</Loading> : 'Show More Videos'}
+          </LoadMoreButton>
+        </ButtonContainer>
+      )}
       <TitleLive>Live Videos</TitleLive>
       <CreateLivestreamButton
         $disabled={liveStreams.length >= 3}

@@ -138,6 +138,7 @@ function LiveCommentsSection({ videoId }: Props) {
   const [error, setError] = useState<string | null>(null);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const socketRef = useRef<Socket | null>(null);
+  const listRef = useRef<HTMLDivElement>(null);
 
   const loadComments = async () => {
     try {
@@ -197,6 +198,13 @@ function LiveCommentsSection({ videoId }: Props) {
     }
   }, [videoId]);
 
+  useEffect(() => {
+    listRef.current?.scrollTo({
+      top: listRef.current.scrollHeight,
+      behavior: "smooth",
+    });
+  }, [comments]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -242,12 +250,35 @@ function LiveCommentsSection({ videoId }: Props) {
         <LiveBadge>Live</LiveBadge>
       </TitleRow>
 
+      {loading && comments.length === 0 ? (
+        <LoadingMessage>Loading live comments...</LoadingMessage>
+      ) : comments.length === 0 ? (
+        <EmptyMessage>No comments yet. Be the first to comment!</EmptyMessage>
+      ) : (
+        <CommentsList ref={listRef}>
+          {commentsNewestLast.map((comment) => (
+            <Comment
+              key={comment.id}
+              comment={comment}
+              onDelete={handleDelete}
+              currentUserId={currentUserId || undefined}
+            />
+          ))}
+        </CommentsList>
+      )}
+
       <CommentForm onSubmit={handleSubmit}>
         <TextArea
           value={content}
           onChange={(e) => {
             setContent(e.target.value);
             setError(null);
+          }}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" && !e.shiftKey) {
+              e.preventDefault();
+              handleSubmit(e as unknown as React.FormEvent);
+            }
           }}
           placeholder="Add a comment..."
           maxLength={1000}
@@ -259,23 +290,6 @@ function LiveCommentsSection({ videoId }: Props) {
       </CommentForm>
 
       {error && <ErrorMessage>{error}</ErrorMessage>}
-
-      {loading && comments.length === 0 ? (
-        <LoadingMessage>Loading live comments...</LoadingMessage>
-      ) : comments.length === 0 ? (
-        <EmptyMessage>No comments yet. Be the first to comment!</EmptyMessage>
-      ) : (
-        <CommentsList>
-          {commentsNewestLast.map((comment) => (
-            <Comment
-              key={comment.id}
-              comment={comment}
-              onDelete={handleDelete}
-              currentUserId={currentUserId || undefined}
-            />
-          ))}
-        </CommentsList>
-      )}
     </CommentsContainer>
   );
 }

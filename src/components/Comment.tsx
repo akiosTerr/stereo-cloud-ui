@@ -71,7 +71,8 @@ const DeleteButton = styled.button`
 
 const CommentContent = styled.p`
     color: #fff;
-    font-size: 0.9rem;
+    font-size: 1.5rem;
+    text-align: left;
     line-height: 1.5;
     margin: 0;
     word-wrap: break-word;
