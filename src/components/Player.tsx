@@ -49,6 +49,14 @@ const ErrorMessage = styled.div`
 
 const LIVESTREAM_STATUS_POLL_MS = 12_000;
 
+type VideoInfoResponse = {
+    id: string;
+    title: string;
+    user_id: string;
+    isLivestream: boolean;
+    livestreamStatus: 'active' | 'idle' | 'completed';
+}
+
 function Player({ }: Props) {
     const location = useLocation();
     const { playbackId } = useParams();
@@ -59,6 +67,8 @@ function Player({ }: Props) {
     const [error, setError] = useState<string | null>(null);
     const [showLiveComments, setShowLiveComments] = useState(false)
     const statusPollRef = useRef<ReturnType<typeof setInterval> | null>(null);
+    const [title, setTitle] = useState<string | null>(null);
+    const [userId, setUserId] = useState<string | null>(null);
 
  
     useEffect(() => {
@@ -77,10 +87,14 @@ function Player({ }: Props) {
         setLoading(true);
         setError(null);
         try {
-            const videoInfo = await fetchPlayerInfo(playbackId!) as VideoInfo | Error;
+            const videoInfo = await fetchPlayerInfo(playbackId!) as VideoInfoResponse | Error;
+            console.log(videoInfo);
+            
             if (videoInfo && typeof videoInfo === 'object' && !(videoInfo instanceof Error) && 'id' in videoInfo) {
                 setVideoId(videoInfo.id);
                 setShowLiveComments(!!videoInfo.isLivestream && videoInfo.livestreamStatus === 'active');
+                setTitle(videoInfo.title);
+                setUserId(videoInfo.user_id);
             } else {
                 setError('Failed to load video information');
             }
@@ -134,8 +148,8 @@ function Player({ }: Props) {
                 tokens={getToken()}
                 playbackId={playbackId}
                 metadata={{
-                    video_title: 'Placeholder (optional)',
-                    viewer_user_id: 'Placeholder (optional)',
+                    video_title: title || 'Placeholder',
+                    viewer_user_id: userId || 'Placeholder',
                 }}
             />
             <Description>{description}</Description>
