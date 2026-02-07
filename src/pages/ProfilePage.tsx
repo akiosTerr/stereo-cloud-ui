@@ -13,6 +13,19 @@ const WrapProfilePage = styled.div`
     padding: 24px;
 `
 
+const VideoInfoContainer = styled.div`
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+`
+
+const VideoDate = styled.p`
+    font-size: 12px;
+    color: #666;
+`
+
 function ProfilePage() {
     const [videos, setVideos] = useState<FormatedVideoAsset[]>([]);
     const { channel_name } = useParams();
@@ -24,6 +37,10 @@ function ProfilePage() {
 
     const getThumbUrl = (id: string) => {
         return `https://image.mux.com/${id}/thumbnail.png?width=445&height=250&time=2`
+    }
+
+    const formatDate = (date: string) => {
+        return new Date(date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
     }
 
     useEffect(() => {
@@ -53,9 +70,12 @@ function ProfilePage() {
                         <VideoThumbnail src={getThumbUrl(item.playback_id)} alt="" />
                         <VideoContent>
                             <VideoTitle>{item.title}</VideoTitle>
-                            <VideoDuration>
-                                {typeof item.duration === 'number' ? formatDuration(item.duration) : '--:--'}
-                            </VideoDuration>
+                            <VideoInfoContainer>
+                                <VideoDuration>
+                                    {typeof item.duration === 'number' ? formatDuration(item.duration) : '--:--'}
+                                </VideoDuration>
+                                <VideoDate>{formatDate(item.created_at)}</VideoDate>
+                            </VideoInfoContainer>
                         </VideoContent>
                     </VideoBlock>
                 ))}

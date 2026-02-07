@@ -6,6 +6,8 @@ import styled from "styled-components";
 import { deleteMuxVideo, deleteLiveStream } from "../api/deleteVideo";
 import Cookies from "js-cookie";
 import ShareModal from "./ShareModal";
+import { unshareVideoWithUser } from "../api/shareVideo";
+import { getUserIdFromToken } from "../utils/jwt";
 import DeleteModal, { type DeleteModalVideo } from "./DeleteModal";
 import CreateLiveStreamModal from "./CreateLiveStreamModal";
 import EditVideoModal, { type EditVideoModalVideo } from "./EditVideoModal";
@@ -89,6 +91,19 @@ const ShareButton = styled.button`
   border: 1px solid transparent;
   &:hover {
     border: 1px solid #04da04;
+  }
+`
+
+const UnshareButton = styled.button`
+  color: #da1204;
+  background-color: transparent;
+  border: 1px solid transparent;
+  &:hover {
+    border: 1px solid #da1204;
+  }
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
   }
 `
 
@@ -197,6 +212,7 @@ const VideoTable = () => {
   const [copiedStreamKeyId, setCopiedStreamKeyId] = useState<string | null>(null)
   const [createLiveStreamModalOpen, setCreateLiveStreamModalOpen] = useState(false)
   const [videoToEdit, setVideoToEdit] = useState<EditVideoModalVideo | null>(null)
+  const [unsharingVideoId, setUnsharingVideoId] = useState<string | null>(null)
 
   const getThumbUrl = (id: string, isPrivate: boolean = false, videoList: VideoAssetWithTokens[] = []) => {
     if (!isPrivate) {
@@ -309,6 +325,24 @@ const VideoTable = () => {
 
   const handleShareUpdate = () => {
     updateSharedVideos();
+  }
+
+  const handleUnshareClick = async (videoId: string) => {
+    const currentUserId = getUserIdFromToken();
+    if (!currentUserId) {
+      alert("You must be logged in to unshare.");
+      return;
+    }
+    setUnsharingVideoId(videoId);
+    try {
+      await unshareVideoWithUser(videoId, currentUserId);
+      await updateSharedVideos();
+    } catch (err) {
+      console.error("Failed to unshare video:", err);
+      alert(err instanceof Error ? err.message : "Failed to unshare video.");
+    } finally {
+      setUnsharingVideoId(null);
+    }
   }
 
   const handleEditClick = (video: { id: string; title: string; description: string }) => {
@@ -428,6 +462,14 @@ const VideoTable = () => {
                   </p>
                 )}
               </div>
+              <ButtonRow style={{ justifyContent: 'center' }}>
+                <UnshareButton
+                  onClick={() => handleUnshareClick(item.id)}
+                  disabled={unsharingVideoId === item.id}
+                >
+                  {unsharingVideoId === item.id ? "..." : "Unshare"}
+                </UnshareButton>
+              </ButtonRow>
             </VideoBlock>
           ))
         )}
