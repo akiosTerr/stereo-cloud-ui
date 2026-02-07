@@ -51,7 +51,7 @@ function Uploader({onSuccess}: UploaderProps) {
         }
     }
 
-    const onSuccessUplodHandler = (e: any) => {
+    const onSuccessUplodHandler = () => {
         onSuccess?.()
     }
 
