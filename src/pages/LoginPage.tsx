@@ -5,7 +5,6 @@ import GetLoginToken, { signup, resendConfirmationEmail } from '../api/auth';
 import { TextInput } from '../style';
 
 const Container = styled.div`
-  height: 50vh;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -14,7 +13,7 @@ const Container = styled.div`
 `;
 
 const FormWrapper = styled.div`
-  background: #2a3133;
+  background: #1b1b1b;
   border: 2px solid white;
   padding: 2rem 3rem;
   border-radius: 12px;
@@ -22,8 +21,7 @@ const FormWrapper = styled.div`
   width: 360px;
   margin-top: 5rem;
   @media (max-width: 450px) {
-    width: 320px;
-    margin-top: 15rem;
+    width: 275px;
   }
 `;
 
