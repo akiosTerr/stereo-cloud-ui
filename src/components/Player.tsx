@@ -3,7 +3,7 @@ import withAuth from "../hoc/PrivateRoute";
 import { useLocation, useParams } from "react-router-dom";
 import { useState, useEffect, useRef } from "react";
 import styled from "styled-components";
-import { fetchPlayerInfo, fetchLivestreamStatus, type VideoInfo } from "../api/fetchVideos";
+import { fetchPlayerInfo, fetchLivestreamStatus } from "../api/fetchVideos";
 import CommentsSection from "./CommentsSection";
 import LiveCommentsSection from "./LiveCommentsSection";
 type Props = {}
