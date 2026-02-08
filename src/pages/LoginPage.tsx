@@ -10,6 +10,7 @@ const Container = styled.div`
   justify-content: center;
   align-items: center;
   background-color: transparent;
+  flex-direction: column;
 `;
 
 const FormWrapper = styled.div`
@@ -19,6 +20,19 @@ const FormWrapper = styled.div`
   border-radius: 12px;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
   width: 360px;
+  margin-top: 5rem;
+  @media (max-width: 425px) {
+    width: 320px;
+    margin-top: 15rem;
+  }
+`;
+
+const GreenFont = styled.span`
+  color: #4ade80;
+`;
+
+const PurpleFont = styled.span`
+  color: #9521f3;
 `;
 
 const Form = styled.form`
@@ -110,6 +124,19 @@ const ResendButton = styled.button`
   }
 `;
 
+const Header = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+`;
+
+const HeaderTitle = styled.h1`
+  font-size: 2.5rem;
+  font-weight: 600;
+  color: #ddd5e4;
+`;
+
 interface LoginFormType {
   login: (token: string, channel_name: string) => void;
 }
@@ -152,13 +179,19 @@ function LoginPage({ login }: LoginFormType) {
     GetLoginToken(loginData, login, setError, setIsLoading);
   };
 
+  const Logo = styled.img`
+    width: 100%;
+    height: fit-content;
+    object-fit: contain;
+  `;
+
   const isEmailConfirmationError = error.toLowerCase().includes('confirm your email');
   const handleResendConfirmation = () => {
     resendConfirmationEmail(email, setError, setSuccessMessage, setIsLoading);
   };
 
   const handleSignupSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();    
+    e.preventDefault();
     setError('');
     setSuccessMessage('');
     if (!turnstileToken && turnstileSiteKey) {
@@ -197,6 +230,7 @@ function LoginPage({ login }: LoginFormType) {
         {mode === 'login' ? (
           <>
             <Title>Login</Title>
+            <Logo src="/wafflestream_banner_logo.png" alt="Logo" />
             <Form onSubmit={handleLoginSubmit}>
               <TextInput
                 type="email"
@@ -232,6 +266,7 @@ function LoginPage({ login }: LoginFormType) {
         ) : (
           <>
             <Title>Create account</Title>
+            <Logo src="/wafflestream_banner_logo.png" alt="Logo" />
             <Form onSubmit={handleSignupSubmit}>
               <TextInput
                 type="email"
@@ -292,6 +327,9 @@ function LoginPage({ login }: LoginFormType) {
           </>
         )}
       </FormWrapper>
+      <Header>
+        <HeaderTitle><GreenFont>Stream</GreenFont> & <PurpleFont>Share</PurpleFont> Videos Instantly</HeaderTitle>
+      </Header>
     </Container>
   );
 }
